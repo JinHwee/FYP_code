@@ -6,7 +6,7 @@ class Graph:
         # @params adjacencyDictionary: adjacencyDictionary[id] is a dictionary that 
         #                              represents id of direct neighbours and len(adjacencyDictionary) <= n; 
         #                              where n = number of vertices in graph
-        self.seed = random.seed(42)
+        self.seed = random.seed(42)     # setting a fixed seed for experiments
         self.vertices = vertices 
         self.adjDictionary = adjacencyDictionary
     
@@ -36,6 +36,8 @@ class Node:
         self.data = data 
         self.neighbours = []
         self.initialized = False
+        self.IdleState = False          # IdleState refers to whether node is available for training
+        self.NodeObjective = None       # NodeObjective refers to ML task identifier
 
     def update_neighbours(self, vertexID):
         # @params vertexID: unique identification of new vertex
