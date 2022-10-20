@@ -1,9 +1,12 @@
+import random
+
 class Graph:
     def __init__(self, vertices, adjacencyDictionary):
         # @params vertices: dictionary in the format int(id): Node(int(i), data)
         # @params adjacencyDictionary: adjacencyDictionary[id] is a dictionary that 
         #                              represents id of direct neighbours and len(adjacencyDictionary) <= n; 
         #                              where n = number of vertices in graph
+        self.seed = random.seed(42)
         self.vertices = vertices 
         self.adjDictionary = adjacencyDictionary
     
