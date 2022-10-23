@@ -3,44 +3,59 @@ import random, math
 random.seed(42)     # setting a fixed seed for experiments
 
 class Graph:
-    # initialize one class variable for edgeWeighsDictionary, so that one can update the weights of edges from Node class
-    # is there a better implementation of this? How to update weights of edges using Graph instance from Node instance?
-    edgeWeighsDictionary = None
-
-    def __init__(self, vertices, adjacencyDictionary, edgeWeightsDictionary):
+    def __init__(self, vertices, adjacencyDictionary):
         # @params vertices: dictionary in the format int(id): Node(int(i), data)
         # @params adjacencyDictionary: adjacencyDictionary[id] is a dictionary that 
         #                              represents id of direct neighbours and len(adjacencyDictionary) <= n; 
         #                              where n = number of vertices in graph
+        # self.edgesWeightDictionary is not available at this point of initialization; will be randomly generated
         self.vertices = vertices 
         self.adjDictionary = adjacencyDictionary
-        Graph.edgeWeighsDictionary = edgeWeightsDictionary
+        self.edgeWeighsDictionary = {}
+        self.__set_edges_weight()
+
+    # private function to randomly generate weights of edges
+    def __set_edges_weight(self):
+        for id, neighbourList in self.adjDictionary.items():
+            self.vertices[id].update_neighbours(neighbourList)
+            for neighbourID in neighbourList:
+                if self.check_edge(id, neighbourID) == float(math.inf):
+                    self.edgeWeighsDictionary[(id, neighbourID)] = random.randint(1,100)
     
+    # adding a new vertex into the graph
     def add_vertex(self, newVertexID, data, listOfVertexNeighbours):
         # @params newVertexID: Node object for vertex to be added to graph topology
         # @params data: data which the newVertex will have
         # @params listOfVertexNeighbours: list of neighbour ids newVertex is connected to
+
+        # check if there is any nodes that had not been initialized in listOfVertexNeighbours
+        setList = set(listOfVertexNeighbours)
+        setID = set(self.vertices.keys())
+        if len(setList - setID) != 0:
+            try:
+                raise ValueError("Uninitialized node detected!")
+            except ValueError as e:
+                print(e)
+
         self.vertices[newVertexID] = Node(newVertexID, data)
         self.adjDictionary[newVertexID] = listOfVertexNeighbours
         self.vertices[newVertexID].update_neighbours(listOfVertexNeighbours)
-        self.__update_edges_weight(newVertexID, listOfVertexNeighbours)             # adds (newVertexID, neighbourID) to edgeWeighsDictionary
+        self.__set_weights_for_new_edges(newVertexID, listOfVertexNeighbours)             # adds (newVertexID, neighbourID) to edgeWeighsDictionary
         for id in listOfVertexNeighbours:
             self.vertices[id].update_neighbours(newVertexID)
 
     # not supposed to be called externally (private update function)
-    def __update_edges_weight(self, vertexID, listOfNeighbours):
-        for id in listOfNeighbours:
-            # assumes that the weight of the edges are 1s
-            # self.edgeWeighsDictionary[(vertexID, id)] = 1
-            # assume that the weight of src->dest =/= dest->src   
-            self.edgeWeighsDictionary[(vertexID, id)] = random.randint(50, 100) 
+    # randomly generate weights for newly added vertex
+    def __set_weights_for_new_edges(self, vertexID, listOfNeighbours):
+        for id in listOfNeighbours: 
+            self.edgeWeighsDictionary[(vertexID, id)] = random.randint(1, 100) 
     
-    # check if edge exist; assuming that it might not be a bidirectional edge
-    def check_edge(cls, srcID, destID):
-        if (srcID, destID) in cls.edgeWeighsDictionary.keys():
-            return cls.edgeWeighsDictionary[(srcID, destID)]
-        elif (destID, srcID) in cls.edgeWeighsDictionary.keys():
-            return cls.edgeWeighsDictionary[(destID, srcID)]
+    # check if edge exist
+    def check_edge(self, srcID, destID):
+        if (srcID, destID) in self.edgeWeighsDictionary.keys():
+            return self.edgeWeighsDictionary[(srcID, destID)]
+        elif (destID, srcID) in self.edgeWeighsDictionary.keys():
+            return self.edgeWeighsDictionary[(destID, srcID)]
         return float(math.inf)
 
     # to print out adjacency matrix of graph
@@ -76,11 +91,7 @@ class Node:
             self.neighbours.extend(vertexID)
             self.initialized = True         # if just initialized, assumes edgeWeighsDictionary had been populated prior to calling this function
         else:
-            # adds (currentID, newVertexID) to edgeWeighsDictionary
-            # assumes that the weight of the edge is 1, update the class variable directly
-            # Graph.edgeWeighsDictionary[(self.id, vertexID)] = 1    
-            # assume that the weight of src->dest =/= dest->src   
-            Graph.edgeWeighsDictionary[(self.id, vertexID)] = random.randint(1, 100) 
+            # appends the newest neighbour into the list
             self.neighbours.append(vertexID)
     
     # to print out information on the node
