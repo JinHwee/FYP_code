@@ -12,6 +12,7 @@ class Graph:
         self.vertices = vertices 
         self.adjDictionary = adjacencyDictionary
         self.edgeWeighsDictionary = {}
+        self.adjacencyMatrix = None
         self.__set_edges_weight()
 
     # private function to randomly generate weights of edges
@@ -58,18 +59,29 @@ class Graph:
             return self.edgeWeighsDictionary[(destID, srcID)]
         return float(math.inf)
 
-    # to print out adjacency matrix of graph
-    def print_information(self):
-        print('\t', end='')
+    # obtain the adjacency matrix and print out information (if needed)
+    def get_adjacency_matrix(self, printOut=False):
+        self.adjacencyMatrix = []
         for id in self.vertices.keys():
-            print(id, end='\t')
-        print()
-        for id in self.vertices.keys():
-            print(id, end='\t')
+            tmp_list = []
             for neighbourID in self.vertices.keys():
-                results = self.check_edge(id, neighbourID)
-                print(results, end="\t") if math.isinf(results) == False else print("inf", end='\t')
+                edgePresent = self.check_edge(id, neighbourID)
+                tmp_list.append(edgePresent)
+            self.adjacencyMatrix.append(tmp_list)
+        
+        if printOut:
+            print('\t', end='')
+            for id in self.vertices.keys():
+                print(id, end='\t')
             print()
+            allIDs = [i for i in self.vertices.keys()]
+            for i in range(len(self.adjacencyMatrix)):
+                print(allIDs[i], end='\t')
+                for weight in self.adjacencyMatrix[i]:
+                    print(weight, end='\t')
+                print()
+        
+        return self.adjacencyMatrix
 
 class Node:
     def __init__(self, id, data):

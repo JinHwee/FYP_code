@@ -1,5 +1,7 @@
+from platform import node
 import random
 from classesDefinition import Graph, Node
+from floyd_warshall import all_pair_shortest_path
 
 def generate_graph():
 
@@ -22,20 +24,26 @@ def generate_graph():
     # creating the first graph
     print("Testing the creation of the graph instance...")
     graphTest = Graph(nodeDictionary, neighbourDictionary)
-    graphTest.print_information()
+    matrix = graphTest.get_adjacency_matrix(printOut=True)
 
     print()
     for id, nodeInstance in nodeDictionary.items():
         nodeInstance.print_information()
+    
+    print()
+    all_pair_shortest_path(matrix)
 
     # adding a sample vertex
     print("\nAdding an additional vertex...")
     graphTest.add_vertex(10, None, [1, 2])
-    graphTest.print_information()
+    matrix = graphTest.get_adjacency_matrix(printOut=True)
 
     print()
     for id, nodeInstance in nodeDictionary.items():
         nodeInstance.print_information()
+
+    print()
+    all_pair_shortest_path(matrix)
 
 if __name__ == "__main__":
     generate_graph()
