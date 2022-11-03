@@ -1,14 +1,23 @@
-from platform import node
-import random
+import os
 from classesDefinition import Graph, Node
 from floyd_warshall import all_pair_shortest_path
+import tensorflow as tf
+
+def read_cifar_data(filePath):
+    print(f"\nLoading from {filePath}")
+    dataset = tf.data.experimental.load(filePath)
+    print(f"Size of dataset loaded: {len(dataset)}")
+    return dataset
 
 def generate_graph():
 
     # generate vertices and store in nodeDictionary, in the format int(id): Node(i, data)
     nodeDictionary = {}
+    data_path = os.path.join(os.getcwd(), "all_data/saved_data_client_")
     for i in range(1, 8):
-        tmp = Node(i, None)
+        currentFile = data_path + str(i)
+        dataDict = read_cifar_data(currentFile)
+        tmp = Node(i, dataDict)
         nodeDictionary[i] = tmp
 
     # generate adjacencyDictionary, in the format int(id): [int(id of neighbour), ...]
@@ -30,19 +39,21 @@ def generate_graph():
     for id, nodeInstance in nodeDictionary.items():
         nodeInstance.print_information()
     
-    print()
+    print("\nPrinting all path shortest path (Brute Force Floyd Warshall)")
     all_pair_shortest_path(matrix)
 
     # adding a sample vertex
+    client10DataPath = os.path.join(os.getcwd(), "all_data/saved_data_client_10")
+    client10Dataset = read_cifar_data(client10DataPath)
     print("\nAdding an additional vertex...")
-    graphTest.add_vertex(10, None, [1, 2])
+    graphTest.add_vertex(10, client10Dataset, [1, 2])
     matrix = graphTest.get_adjacency_matrix(printOut=True)
 
     print()
     for id, nodeInstance in nodeDictionary.items():
         nodeInstance.print_information()
 
-    print()
+    print("\nPrinting all path shortest path (Brute Force Floyd Warshall)")
     all_pair_shortest_path(matrix)
 
 if __name__ == "__main__":
