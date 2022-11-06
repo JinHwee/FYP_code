@@ -1,4 +1,4 @@
-import os
+import os, random
 from classesDefinition import Graph, Node
 from floyd_warshall import all_pair_shortest_path
 import tensorflow as tf
@@ -31,9 +31,32 @@ def generate_graph():
     neighbourDictionary[nodeDictionary[7].id] = [nodeDictionary[3].id, nodeDictionary[6].id]
     
     # creating the first graph
-    print("Testing the creation of the graph instance...")
+    print("\nTesting the creation of the graph instance...")
     graphTest = Graph(nodeDictionary, neighbourDictionary)
     matrix = graphTest.get_adjacency_matrix(printOut=True)
+
+    # setting up node objectives for each node in the graph
+    objectives = [1.1, 1.2, 2.1]                                                # values allocateed to each node
+    objectivesDictionary = {1.1: "CIFAR 10", 1.2: "CIFAR 100", 2.1:"NLP"}       # what each float represents
+    for id, nodeInstance in nodeDictionary.items():
+        index = random.randint(0, 2)
+        nodeDictionary[id].set_objective(objectives[index])
+
+    # testing for nodeObjectiveMatrix
+    nodeObjectiveMatrix = {i:[] for i in nodeDictionary.keys()}
+    allIDs = [id for id in nodeDictionary.keys()]
+    for index1 in range(len(allIDs) - 1):
+        for index2 in range(index1, len(allIDs)):
+            id1, id2 = allIDs[index1], allIDs[index2]
+            if nodeDictionary[id1].get_objective() == nodeDictionary[id2].get_objective():
+                if id2 not in nodeObjectiveMatrix[id1]:
+                    nodeObjectiveMatrix[id1].append(id2)
+                if id1 not in nodeObjectiveMatrix[id2]:
+                    nodeObjectiveMatrix[id2].append(id1)
+
+    print()
+    for id, objectiveMatrix in nodeObjectiveMatrix.items():
+        nodeDictionary[id].set_node_objective_matrix(objectiveMatrix)
 
     print()
     for id, nodeInstance in nodeDictionary.items():

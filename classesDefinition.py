@@ -95,6 +95,7 @@ class Node:
         self.initialized = False
         self.IdleState = False          # IdleState refers to whether node is available for training
         self.NodeObjective = None       # NodeObjective refers to ML task identifier
+        self.NodeObjectiveMatrix = None # NodeObjectiveMatrix refers to list of nodes that have relevant objective(s) as self
 
     def update_neighbours(self, vertexID):
         # @params vertexID: unique identification of new vertex
@@ -126,7 +127,15 @@ class Node:
 
     # to-do node_specific_objective_matrix: stores all nodes with same objective
     # node.objective_adj_matrix: nodes that have objectives that are relevant to self 
+    
+    # pass in the objective_adj_matrix from graph definition
+    def set_node_objective_matrix(self, matrix):
+        self.NodeObjectiveMatrix = matrix
+    
+    def get_node_objective_matrix(self):
+        return self.NodeObjectiveMatrix
 
     # to print out information on the node
     def print_information(self):
         print(f"Node {self.id} has data {self.data} and is connected to nodes {self.neighbours}")
+        print(f'Relevant nodes with similar objectives: {self.NodeObjectiveMatrix}')
