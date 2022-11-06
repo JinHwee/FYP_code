@@ -105,6 +105,14 @@ class Node:
         else:
             # appends the newest neighbour into the list
             self.neighbours.append(vertexID)
+
+    # returns the current status/state of the node
+    def get_IdleState(self):
+        return self.IdleState
+    
+    # sets whether Node is Idle or not (T/F)
+    def set_IdleState(self, state):
+        self.IdleState = state
     
     # to-do node.set_data(file) (lowest priority)
 
