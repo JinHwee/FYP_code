@@ -91,7 +91,7 @@ class Node:
         #                                 listOfDirectNeighbours is empty at start, and will be populated
         self.id = id
         self.data = data 
-        self.neighbours = []
+        self.neighbours = []            # direct edge between 2 nodes
         self.initialized = False
         self.IdleState = False          # IdleState refers to whether node is available for training
         self.NodeObjective = None       # NodeObjective refers to ML task identifier
@@ -106,6 +106,19 @@ class Node:
             # appends the newest neighbour into the list
             self.neighbours.append(vertexID)
     
+    # to-do node.set_data(file) (lowest priority)
+
+    # to-do node.set_objective() / node.get_objective
+    # on node.objective (1.1 = CIFAR 10, 1.2 = CIFAR 100, 2.1 = NLP)
+    def set_objective(self, objective):
+        self.NodeObjective = objective
+
+    def get_objective(self):
+        return self.NodeObjective
+
+    # to-do node_specific_objective_matrix: stores all nodes with same objective
+    # node.objective_adj_matrix: nodes that have objectives that are relevant to self 
+
     # to print out information on the node
     def print_information(self):
         print(f"Node {self.id} has data {self.data} and is connected to nodes {self.neighbours}")
