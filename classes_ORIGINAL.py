@@ -114,10 +114,7 @@ class Node:
     # sets whether Node is Idle or not (T/F)
     def set_IdleState(self, state):
         self.IdleState = state
-    
-    # to-do node.set_data(file) (lowest priority)
 
-    # to-do node.set_objective() / node.get_objective
     # on node.objective (1.1 = CIFAR 10, 1.2 = CIFAR 100, 2.1 = NLP)
     def set_objective(self, objective):
         self.NodeObjective = objective

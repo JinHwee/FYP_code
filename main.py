@@ -1,5 +1,6 @@
 import os, random
-from classesDefinition import Graph, Node
+from class_Graph import Graph
+from class_Node import Node
 from floyd_warshall import all_pair_shortest_path
 import tensorflow as tf
 
@@ -33,7 +34,8 @@ def generate_graph():
     # creating the first graph
     print("\nTesting the creation of the graph instance...")
     graphTest = Graph(nodeDictionary, neighbourDictionary)
-    matrix = graphTest.get_adjacency_matrix(printOut=True)
+    matrix = graphTest.get_adjacency_matrix()
+    graphTest.print_graph_information()
 
     # setting up node objectives for each node in the graph
     objectives = [1.1, 1.2, 2.1]                                                # values allocateed to each node
@@ -60,9 +62,9 @@ def generate_graph():
 
     print()
     for id, nodeInstance in nodeDictionary.items():
-        nodeInstance.print_information()
+        nodeInstance.print_node_information()
     
-    print("\nPrinting all path shortest path (Brute Force Floyd Warshall)")
+    print("\nPrinting all pair shortest path (Brute Force Floyd Warshall)")
     all_pair_shortest_path(matrix)
 
     # adding a sample vertex
@@ -70,13 +72,14 @@ def generate_graph():
     client10Dataset = read_cifar_data(client10DataPath)
     print("\nAdding an additional vertex...")
     graphTest.add_vertex(10, client10Dataset, [1, 2])
-    matrix = graphTest.get_adjacency_matrix(printOut=True)
+    matrix = graphTest.get_adjacency_matrix()
+    graphTest.print_graph_information()
 
     print()
     for id, nodeInstance in nodeDictionary.items():
-        nodeInstance.print_information()
+        nodeInstance.print_node_information()
 
-    print("\nPrinting all path shortest path (Brute Force Floyd Warshall)")
+    print("\nPrinting all pair shortest path (Brute Force Floyd Warshall)")
     all_pair_shortest_path(matrix)
 
 if __name__ == "__main__":
