@@ -44,7 +44,63 @@ class Graph:
         elif (destID, srcID) in self.edgeWeightsDictionary.keys():
             return self.edgeWeightsDictionary[(destID, srcID)]
         return float(math.inf)
+
+    # updates node class's NodeObjectiveMatrix variable; to populate it with ids of relevant nodes
+    def groupings_w_similar_objective(self):
+        # id: [ list of nodes with similar objectives]
+        nodeGroupings = {i:[] for i in self.vertices.keys()}
+        for index1 in self.vertices.keys():
+            allIDs = [id for id in self.vertices.keys()]
+            for index1 in range(len(allIDs) - 1):
+                for index2 in range(index1, len(allIDs)):
+                    id1, id2 = allIDs[index1], allIDs[index2]
+                    # update the list with nodes other than self, if nodes have the same objective as self
+
+                    #####################################################################################################
+                    # qns: should the current node be included in the list as well? Seems to me that it can be removed. #
+                    #####################################################################################################
+                    if self.vertices[id1].get_objective() == self.vertices[id2].get_objective() and id1 !=id2:
+                        if id2 not in nodeGroupings[id1]:
+                            nodeGroupings[id1].append(id2)
+                        if id1 not in nodeGroupings[id2]:
+                            nodeGroupings[id2].append(id1)
+        print()
+        print("Set of nodes with similar objectives to current node\n")
+        for id, objectiveMatrix in nodeGroupings.items():
+            print(f"\tNode {id}", end=': ')
+            # updating node <id> with nodes that have the same objective
+            self.vertices[id].set_node_objective_matrix(objectiveMatrix)
+            # testing to verify that node_objective_matrix is updated successfully
+            print(self.vertices[id].get_node_objective_matrix())
         
+    # returns path cost for each pair of nodes
+    def all_pair_shortest_path(self):
+        # pathCostMatrix [
+        #    1   2   ...     n
+        # 1 [inf, x, ...     y]
+        # 2 [x, inf, ...     z]
+        # ]
+        # pathCostMatrix[i][j] = pathCostMatrix[row][column]
+        matrix = self.get_adjacency_matrix()
+        pathCost = matrix          # initilisation of matrix
+        newPathCost = []
+
+        for currentNode in range(len(matrix)):
+            for i in range(len(matrix)):
+                tmp_matrix = []
+                for j in range(len(matrix)):
+                    if i == j:
+                        tmp_matrix.append(0)
+                    else:
+                        presentEdge = pathCost[i][j]
+                        newCost = pathCost[i][currentNode] + pathCost[currentNode][j]
+                        tmp_matrix.append(min(presentEdge, newCost))
+                newPathCost.append(tmp_matrix)
+            pathCost = newPathCost
+            newPathCost = []
+            
+        return pathCost
+
     # function to display information about the graph; in matrix format
     def print_graph_information(self):
         self.__update_adjacency_matrix()

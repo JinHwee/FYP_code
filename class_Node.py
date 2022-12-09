@@ -14,7 +14,13 @@ class Node:
         self.initialized = False        # will be called when graph is initialized; for new nodes to be added
         self.IdleState = False          # IdleState refers to whether node is available for training
         self.NodeObjective = None       # NodeObjective refers to ML task identifier
+
+        ####################################################
+        # Qns: can we simplify and keep only one variable? #
+        ####################################################
+        
         self.NodeObjectiveMatrix = None # NodeObjectiveMatrix refers to list of nodes that have relevant objective(s) as self
+        self.distanceToRelevantNodes = None     # adjacency matrix that combines both distance and relevant nodes 
 
     # @params vertexID: unique identification of new vertex
     # @params initialized: whether the node has been init
@@ -25,8 +31,6 @@ class Node:
         else:
             # appends the newest neighbour into the list
             self.neighbours.append(vertexID)
-
-
     
     # to print out information on the node
     def print_node_information(self):
@@ -66,3 +70,9 @@ class Node:
 
     def set_node_objective_matrix(self, matrix):
         self.NodeObjectiveMatrix = matrix
+
+    def set_distance_to_relevant_nodes(self, distanceDict):
+        self.distanceToRelevantNodes = distanceDict
+
+    def get_distance_to_relevant_nodes(self):
+        return self.distanceToRelevantNodes

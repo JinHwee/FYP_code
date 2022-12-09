@@ -23,34 +23,6 @@ def read_cifar_data(filePath):
     print(f"Size of dataset loaded: {len(dataset)}")
     return dataset
 
-# obtain Floyd Warshall All Pair Shortesst path matrix
-def fw_algorithm(matrix):
-    print("\nPrinting all pair shortest path (Brute Force Floyd Warshall)")
-    apsp_matrix = all_pair_shortest_path(matrix)
-    for cost in apsp_matrix:
-        print(cost)
-    return apsp_matrix
-
-def nodeObjectiveMatrixTest():
-    # testing for nodeObjectiveMatrix
-    nodeObjectiveMatrix = {i:[] for i in nodeDictionary.keys()}
-    allIDs = [id for id in nodeDictionary.keys()]
-    for index1 in range(len(allIDs) - 1):
-        for index2 in range(index1, len(allIDs)):
-            id1, id2 = allIDs[index1], allIDs[index2]
-            if nodeDictionary[id1].get_objective() == nodeDictionary[id2].get_objective() and id1 !=id2:
-                if id2 not in nodeObjectiveMatrix[id1]:
-                    nodeObjectiveMatrix[id1].append(id2)
-                if id1 not in nodeObjectiveMatrix[id2]:
-                    nodeObjectiveMatrix[id2].append(id1)
-
-    print()
-    print("Set of nodes with similar objectives to current node:")
-    for id, objectiveMatrix in nodeObjectiveMatrix.items():
-        print(f"\tCurrent node {id}", end=': ')
-        nodeDictionary[id].set_node_objective_matrix(objectiveMatrix)
-        print(nodeDictionary[id].get_node_objective_matrix())
-
 def generate_graph():
     # generate vertices and store in nodeDictionary, in the format int(id): Node(i, data)
     data_path = os.path.join(os.getcwd(), "all_data/saved_data_client_")
@@ -71,38 +43,53 @@ def generate_graph():
     # creating the first graph
     print("\nTesting the creation of the graph instance...")
     graphTest = Graph(nodeDictionary, neighbourDictionary)
-    matrix = graphTest.get_adjacency_matrix()
     graphTest.print_graph_information()
 
     # setting up node objectives for each node in the graph
     for id, nodeInstance in nodeDictionary.items():
         index = random.randint(0, 2)
         nodeDictionary[id].set_objective(objectives[index])
-
-    nodeObjectiveMatrixTest()
+    graphTest.groupings_w_similar_objective()
 
     print()
     for id, nodeInstance in nodeDictionary.items():
         nodeInstance.print_node_information()
     
-    apsp_matrix = fw_algorithm(matrix)
+    apsp_matrix = graphTest.all_pair_shortest_path()
+    print("\nPrinting all pair shortest path (Brute Force Floyd Warshall)")
+    for cost in apsp_matrix:
+        print(cost)
 
     # adding a sample vertex
     client10DataPath = os.path.join(os.getcwd(), "all_data/saved_data_client_10")
     client10Dataset = read_cifar_data(client10DataPath)
     print("\nAdding an additional vertex...")
     graphTest.add_vertex(10, client10Dataset, [1, 2], objectives[random.randint(0,2)])
-    matrix = graphTest.get_adjacency_matrix()
     graphTest.print_graph_information()
-
-    nodeObjectiveMatrixTest()
+    graphTest.groupings_w_similar_objective()
 
     print()
     for id, nodeInstance in nodeDictionary.items():
         nodeInstance.print_node_information()
 
-    matrix = all_pair_shortest_path(matrix)
-    apsp_matrix = fw_algorithm(matrix)
+    apsp_matrix = graphTest.all_pair_shortest_path()
+    print("\nPrinting all pair shortest path (Brute Force Floyd Warshall)")
+    for cost in apsp_matrix:
+        print(cost)
+
+    # from apsp_matrix, create distanceToRelevantNodes in each instantiated node
+    print()
+    nodeIDs = list(nodeDictionary.keys())
+    for rowIndex in range(len(apsp_matrix)):
+        tmp_dict = {}
+        currNodeRelevantList = nodeDictionary[nodeIDs[rowIndex]].get_node_objective_matrix()
+        for id in currNodeRelevantList:
+            tmp_dict[id] = apsp_matrix[rowIndex][nodeIDs.index(id)]
+        nodeDictionary[nodeIDs[rowIndex]].set_distance_to_relevant_nodes(tmp_dict)
+    
+    for key, node in nodeDictionary.items():
+        print(f"Node {key}:", end=" ")
+        print(node.get_distance_to_relevant_nodes())
 
 if __name__ == "__main__":
     generate_graph()
