@@ -91,7 +91,7 @@ def generate_graph():
     client10DataPath = os.path.join(os.getcwd(), "all_data/saved_data_client_10")
     client10Dataset = read_cifar_data(client10DataPath)
     print("\nAdding an additional vertex...")
-    graphTest.add_vertex(10, client10Dataset, [1, 2])
+    graphTest.add_vertex(10, client10Dataset, [1, 2], objectives[random.randint(0,2)])
     matrix = graphTest.get_adjacency_matrix()
     graphTest.print_graph_information()
 

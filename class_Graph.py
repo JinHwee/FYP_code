@@ -20,7 +20,7 @@ class Graph:
     # @params data: data which the newVertex will have
     # @params listOfVertexNeighbours: list of neighbour ids newVertex is connected to
     # check if there is any nodes that had not been initialized in listOfVertexNeighbours
-    def add_vertex(self, newVertexID, data, listOfVertexNeighbours):
+    def add_vertex(self, newVertexID, data, listOfVertexNeighbours, objective):
         setList = set(listOfVertexNeighbours)
         setID = set(self.vertices.keys())
         if len(setList - setID) != 0:
@@ -30,6 +30,7 @@ class Graph:
                 print(e)
 
         self.vertices[newVertexID] = Node(newVertexID, data)
+        self.vertices[newVertexID].set_objective(objective)
         self.adjDictionary[newVertexID] = listOfVertexNeighbours
         self.vertices[newVertexID].update_neighbours(listOfVertexNeighbours)
         self.__set_weights_for_new_edges(newVertexID, listOfVertexNeighbours)   # calling private function; to randomly generate weights for new edges
