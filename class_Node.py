@@ -26,9 +26,11 @@ class Node:
             # appends the newest neighbour into the list
             self.neighbours.append(vertexID)
 
+
+    
     # to print out information on the node
     def print_node_information(self):
-        print(f"Node {self.id} has data {self.data} and is connected to nodes {self.neighbours}")
+        print(f"Node {self.id} has objective {self.NodeObjective}, data {self.data} and is connected to nodes {self.neighbours}")
         print(f'Relevant nodes with similar objectives: {self.NodeObjectiveMatrix}')
 
     #################################################

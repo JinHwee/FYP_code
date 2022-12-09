@@ -24,6 +24,4 @@ def all_pair_shortest_path(matrix):
         previousPathCost = newPathCost
         newPathCost = []
     
-    for newCost in previousPathCost:
-        print(newCost)
-
+    return previousPathCost
