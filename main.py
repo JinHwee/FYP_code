@@ -1,7 +1,6 @@
 import os, random
 from class_Graph import Graph
 from class_Node import Node
-from floyd_warshall import all_pair_shortest_path
 import tensorflow as tf
 
 ###############################
