@@ -27,34 +27,24 @@ def all_pair_shortest_path(matrix):
                     counter += 1
                     # key[0] is the source node, key[-1] is the last added node
                     if newCost < math.inf and newCost < presentEdge:
-                        allKeys = [key for key in paths.keys() if key[0] == i+1 and key[-1] == currentNode+1]
-                        # print(allKeys)
-                        # for tup in allKeys:
-                        #     prevValue = paths.get(tup)
-                        #     print(f'{tup}: {prevValue}')
-                        #     listTup = list(tup)
-                        #     listTup.append(j+1)
-                        #     addedValue = paths.get((currentNode+1, j+1), previousPathCost[currentNode][j])
-                        #     print(f'{listTup}: {prevValue + addedValue}')
-                        #     paths[tuple(listTup)] =  prevValue + addedValue
-                        allNewPaths = [key for key in paths.keys() if key[0] == currentNode+1]
-                        for tup in allKeys:
-                            for nested_tup in allNewPaths:
-                                set_tup = set(tup)
-                                set_nested = set(nested_tup)
-                                if len(set_tup.intersection(set_nested)) == 1:
-                                    listtup = list(tup)
-                                    listnested = list(nested_tup)
-                                    listtup.extend(listnested[1:])
-                                    if tuple(listtup) not in paths.keys():
-                                        paths[tuple(listtup)] = paths.get(tuple(tup)) + paths.get(tuple(nested_tup))
+                        allDetectedPaths = [key for key in paths.keys() if key[0] == i+1 and key[-1] == currentNode+1]
+                        additionalPaths = [key for key in paths.keys() if key[0] == currentNode+1]
+                        for basePath in allDetectedPaths:
+                            for pathToBeMerged in additionalPaths:
+                                setBasePath = set(basePath)
+                                setPathToBeMerged = set(pathToBeMerged)
+                                # ensures that only the destination from first set is the common vertex between the 2 sets
+                                if len(setBasePath.intersection(setPathToBeMerged)) == 1:
+                                    listBasePath = list(basePath)
+                                    listPathToBeMerged = list(pathToBeMerged)
+                                    listBasePath.extend(listPathToBeMerged[1:])
+                                    if tuple(listBasePath) not in paths.keys():
+                                        paths[tuple(listBasePath)] = paths.get(tuple(basePath)) + paths.get(tuple(pathToBeMerged))
                     tmp_matrix.append(min(presentEdge, newCost))
             newPathCost.append(tmp_matrix)
         previousPathCost = newPathCost
         newPathCost = []
-
-    # subset difference of 1 node to be added if source and destination node the same
-
+        
     return previousPathCost, paths
 
 def floyd_warshall_checker(matrix):
