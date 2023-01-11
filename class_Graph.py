@@ -55,10 +55,6 @@ class Graph:
                 for index2 in range(index1, len(allIDs)):
                     id1, id2 = allIDs[index1], allIDs[index2]
                     # update the list with nodes other than self, if nodes have the same objective as self
-
-                    #####################################################################################################
-                    # qns: should the current node be included in the list as well? Seems to me that it can be removed. #
-                    #####################################################################################################
                     if self.vertices[id1].get_objective() == self.vertices[id2].get_objective() and id1 !=id2:
                         if id2 not in nodeGroupings[id1]:
                             nodeGroupings[id1].append(id2)
