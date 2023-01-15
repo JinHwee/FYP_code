@@ -16,10 +16,11 @@ nodeObjectiveMatrix = None
 # functions declaration #
 #########################
 
+# loading data and allocating the data to a node
 def read_cifar_data(filePath):
-    print(f"\nLoading from {filePath}")
+    # print(f"\nLoading from {filePath}")
     dataset = tf.data.experimental.load(filePath)
-    print(f"Size of dataset loaded: {len(dataset)}")
+    # print(f"Size of dataset loaded: {len(dataset)}")
     return dataset
 
 def generate_graph():
