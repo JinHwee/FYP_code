@@ -44,6 +44,51 @@ def setting_objective_of_node(manual_setting = False):
             index = random.randint(0, 2)
             nodeDictionary[id].set_objective(objectives[index])
 
+# check and update list of relevant nodes for each vertex from path information
+def update_list_of_relevant_nodes(pathInfo):
+    # because each vertex has already been updated with relevant IDs of vertices that have the same objectives
+    # the path can be retrieved by using the current node as the source and each IDs in the list as the destination
+    # if path contains additional vertices required for the path to be completed, then add the missing vertices into the list of relevant nodes
+    for id in nodeDictionary.keys():
+        relevantNodes = nodeDictionary[id].get_dict_of_relevant_nodes()
+        for relevantID in list(relevantNodes.keys()):
+            # print(f'Current node {id} Relevant node {relevantID}', end=' ')
+            relevantPaths = {path:pathCost for path, pathCost in pathInfo.items() if path[0] == id and path[-1] == relevantID}
+            shortestRelevantPaths = {path:pathCost for path, pathCost in relevantPaths.items() if pathCost == min(relevantPaths.values())}
+            for path in shortestRelevantPaths.keys():
+                # each node that is missing will be tagged as transmission only nodes, False because these nodes do not have the same objectives
+                path = {node:False for node in list(path) if node != id and node not in relevantNodes.keys()}
+                nodeDictionary[id].DictionaryOfRelevantNodes.update(path)
+
+def update_node_with_paths(pathInfo):
+    for id in nodeDictionary.keys():
+        relevantNodes = nodeDictionary[id].get_dict_of_relevant_nodes()
+        for relevantID in list(relevantNodes.keys()):
+            relevantPaths = {path:pathCost for path, pathCost in pathInfo.items() if path[0] == id and path[-1] == relevantID}
+            shortestRelevantPaths = {path:pathCost for path, pathCost in relevantPaths.items() if pathCost == min(relevantPaths.values())}
+            nodeDictionary[id].set_paths_to_relevant_nodes(shortestRelevantPaths)
+
+def update_graph_information(graphInstance, update):
+    # updates each node with IDs of nodes that have the same objective as itself
+    graphInstance.groupings_w_similar_objective(update)
+    
+    # apsp_matrix: shortest distance to each vertices in matrix format & all_paths: paths for each distance
+    apsp_matrix, all_paths = graphInstance.all_pair_shortest_path()
+    # print("\nPrinting all pair shortest path (Brute Force Floyd Warshall):")
+    # for row in apsp_matrix:
+    #     print(row)
+
+    # check for disjointed sets and the need for transmission only nodes, using paths retrieved from previous step
+    update_list_of_relevant_nodes(all_paths)
+    update_node_with_paths(all_paths)
+
+    # updating each node with shortest path distance to each relevant nodes
+    set_shortest_distance_to_relevant_nodes(apsp_matrix)
+
+    # node information must be retrieved after update to the nodes has been completed
+    for _, nodeInstance in nodeDictionary.items():
+        nodeInstance.print_node_information()
+
 def generate_graph():
     # generate vertices and store in nodeDictionary, in the format int(id): Node(i, data)
     data_path = os.path.join(os.getcwd(), "all_data/saved_data_client_")
