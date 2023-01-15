@@ -43,30 +43,30 @@ class Graph:
             return self.edgeWeightsDictionary[(destID, srcID)]
         return float(math.inf)
 
-    # updates node class's NodeObjectiveMatrix variable; to populate it with ids of relevant nodes
-    def groupings_w_similar_objective(self):
+    # updates node class's DictionaryOfRelevantNodes variable; to populate it with ids of relevant nodes
+    def groupings_w_similar_objective(self, update):
         # id: [ list of nodes with similar objectives]
-        nodeGroupings = {i:[] for i in self.vertices.keys()}
+        nodeGroupings = {i:{} for i in self.vertices.keys()}
         for index1 in self.vertices.keys():
             allIDs = [id for id in self.vertices.keys()]
             for index1 in range(len(allIDs) - 1):
                 for index2 in range(index1, len(allIDs)):
                     id1, id2 = allIDs[index1], allIDs[index2]
                     # update the list with nodes other than self, if nodes have the same objective as self
+                    # all these ids will be having the value True because the objective is similar
                     if self.vertices[id1].get_objective() == self.vertices[id2].get_objective() and id1 !=id2:
                         if id2 not in nodeGroupings[id1]:
-                            nodeGroupings[id1].append(id2)
+                            nodeGroupings[id1].update({id2:True})
                         if id1 not in nodeGroupings[id2]:
-                            nodeGroupings[id2].append(id1)
-        print()
-        print("Set of nodes with similar objectives to current node\n")
-        for id, objectiveMatrix in nodeGroupings.items():
+                            nodeGroupings[id2].update({id1:True})
+
+        print("\nSet of nodes with similar objectives to current node\n")
+        for id, objectiveDict in nodeGroupings.items():
             print(f"\tNode {id}", end=': ')
             # updating node <id> with nodes that have the same objective
-            self.vertices[id].set_list_of_nodes_with_similar_objectives(objectiveMatrix)
+            self.vertices[id].set_dict_of_relevant_nodes(objectiveDict, update)
             # testing to verify that node_objective_matrix is updated successfully
-            print(self.vertices[id].get_list_of_nodes_with_similar_objectives())
-        print()
+            print(self.vertices[id].get_dict_of_relevant_nodes())
         
     # returns path cost for each pair of nodes
     def all_pair_shortest_path(self):
