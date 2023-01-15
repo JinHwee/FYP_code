@@ -70,12 +70,11 @@ def generate_graph():
     setting_objective_of_node(manual_setting=True)
 
     # adding a sample vertex
-    client10DataPath = os.path.join(os.getcwd(), "all_data/saved_data_client_10")
-    client10Dataset = read_cifar_data(client10DataPath)
+    client8DataPath = os.path.join(os.getcwd(), "all_data/saved_data_client_10")
+    client8Dataset = read_cifar_data(client8DataPath)
     print("\nAdding an additional vertex...")
-    graphTest.add_vertex(10, client10Dataset, [1, 2], objectives[random.randint(0,2)])
+    graphTest.add_vertex(8, client8Dataset, [1, 2], objectives[random.randint(0,2)])
     graphTest.print_graph_information()
-    graphTest.groupings_w_similar_objective()
 
     print()
     for id, nodeInstance in nodeDictionary.items():
