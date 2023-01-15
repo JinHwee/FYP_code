@@ -10,7 +10,6 @@ nodeDictionary = {}
 neighbourDictionary = {}
 objectives = [1.1, 1.2, 2.1]                                                # values allocateed to each node
 objectivesDictionary = {1.1: "CIFAR 10", 1.2: "CIFAR 100", 2.1:"NLP"}       # what each float represents
-nodeObjectiveMatrix = None
 
 #########################
 # functions declaration #
@@ -43,6 +42,17 @@ def setting_objective_of_node(manual_setting = False):
         for id in nodeDictionary.keys():
             index = random.randint(0, 2)
             nodeDictionary[id].set_objective(objectives[index])
+
+# path and path cost update function already implemented, this function might be redundant
+def set_shortest_distance_to_relevant_nodes(matrix):
+    # from apsp_matrix, create distanceToRelevantNodes in each instantiated node
+    nodeIDs = list(nodeDictionary.keys())
+    for rowIndex in range(len(matrix)):
+        tmp_dict = {}
+        currNodeRelevantList = nodeDictionary[nodeIDs[rowIndex]].get_dict_of_relevant_nodes()
+        for id in currNodeRelevantList.keys():
+            tmp_dict[id] = matrix[rowIndex][nodeIDs.index(id)]
+        nodeDictionary[nodeIDs[rowIndex]].set_distance_to_relevant_node(tmp_dict)
 
 # check and update list of relevant nodes for each vertex from path information
 def update_list_of_relevant_nodes(pathInfo):
@@ -113,6 +123,7 @@ def generate_graph():
 
     # manual_setting = False -> generate a graph with nodes randomly allocated an objective
     setting_objective_of_node(manual_setting=True)
+    update_graph_information(graphTest, update=False)
 
     # adding a sample vertex
     client8DataPath = os.path.join(os.getcwd(), "all_data/saved_data_client_10")
@@ -124,4 +135,5 @@ def generate_graph():
     update_graph_information(graphTest, update=True)
 
 if __name__ == "__main__":
+    random.seed(42)
     generate_graph()
