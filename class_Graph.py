@@ -1,7 +1,5 @@
-import math, random
+import math, random, copy
 from class_Node import Node
-
-random.seed(42)
 
 class Graph:
     # @params vertices: dictionary in the format int(id): Node(int(i), data)
@@ -65,9 +63,10 @@ class Graph:
         for id, objectiveMatrix in nodeGroupings.items():
             print(f"\tNode {id}", end=': ')
             # updating node <id> with nodes that have the same objective
-            self.vertices[id].set_node_objective_matrix(objectiveMatrix)
+            self.vertices[id].set_list_of_nodes_with_similar_objectives(objectiveMatrix)
             # testing to verify that node_objective_matrix is updated successfully
-            print(self.vertices[id].get_node_objective_matrix())
+            print(self.vertices[id].get_list_of_nodes_with_similar_objectives())
+        print()
         
     # returns path cost for each pair of nodes
     def all_pair_shortest_path(self):
@@ -78,9 +77,11 @@ class Graph:
         # ]
         # pathCostMatrix[i][j] = pathCostMatrix[row][column]
         matrix = self.get_adjacency_matrix()
-        pathCost = matrix          # initilisation of matrix
+        previousPathCost = copy.deepcopy(matrix)          # initilisation of matrix
         newPathCost = []
 
+        paths = {}
+        counter = 0
         for currentNode in range(len(matrix)):
             for i in range(len(matrix)):
                 tmp_matrix = []
@@ -88,14 +89,33 @@ class Graph:
                     if i == j:
                         tmp_matrix.append(0)
                     else:
-                        presentEdge = pathCost[i][j]
-                        newCost = pathCost[i][currentNode] + pathCost[currentNode][j]
+                        presentEdge = previousPathCost[i][j]
+                        newCost = previousPathCost[i][currentNode] + previousPathCost[currentNode][j]
+                        if counter < len(matrix) ** 2 and presentEdge < math.inf:
+                            # stores the direct edges between 2 distinct vertices
+                            paths[(i+1, j+1)] = presentEdge
+                        counter += 1
+                        # key[0] is the source node, key[-1] is the last added node
+                        if newCost < math.inf and newCost < presentEdge:
+                            allDetectedPaths = [key for key in paths.keys() if key[0] == i+1 and key[-1] == currentNode+1]
+                            additionalPaths = [key for key in paths.keys() if key[0] == currentNode+1]
+                            for basePath in allDetectedPaths:
+                                for pathToBeMerged in additionalPaths:
+                                    setBasePath = set(basePath)
+                                    setPathToBeMerged = set(pathToBeMerged)
+                                    # ensures that only the destination from first set is the common vertex between the 2 sets
+                                    if len(setBasePath.intersection(setPathToBeMerged)) == 1:
+                                        listBasePath = list(basePath)
+                                        listPathToBeMerged = list(pathToBeMerged)
+                                        listBasePath.extend(listPathToBeMerged[1:])
+                                        if tuple(listBasePath) not in paths.keys():
+                                            paths[tuple(listBasePath)] = paths.get(tuple(basePath)) + paths.get(tuple(pathToBeMerged))
                         tmp_matrix.append(min(presentEdge, newCost))
                 newPathCost.append(tmp_matrix)
-            pathCost = newPathCost
+            previousPathCost = newPathCost
             newPathCost = []
             
-        return pathCost
+        return previousPathCost, paths
 
     # function to display information about the graph; in matrix format
     def print_graph_information(self):
