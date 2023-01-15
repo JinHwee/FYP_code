@@ -1,7 +1,5 @@
 import math, random
 
-random.seed(42)
-
 class Node:
     # @params id: unique vertex identification number
     # @params data: data that this particular vertex has (training data)
@@ -13,14 +11,10 @@ class Node:
         self.neighbours = []            # direct edge between 2 nodes; immediate neighbours
         self.initialized = False        # will be called when graph is initialized; for new nodes to be added
         self.IdleState = False          # IdleState refers to whether node is available for training
-        self.NodeObjective = None       # NodeObjective refers to ML task identifier
-
-        ####################################################
-        # Qns: can we simplify and keep only one variable? #
-        ####################################################
-        
-        self.NodeObjectiveMatrix = None # NodeObjectiveMatrix refers to list of nodes that have relevant objective(s) as self
+        self.NodeObjective = None       # NodeObjective refers to ML task identifier        
+        self.ListOfNodesWithSimilarObj = None   # ListOfNodesWithSimilarObj refers to list of nodes that have relevant objective(s) as self
         self.distanceToRelevantNodes = None     # adjacency matrix that combines both distance and relevant nodes 
+        self.pathToRelevantNodes = None
 
     # @params vertexID: unique identification of new vertex
     # @params initialized: whether the node has been init
@@ -35,7 +29,7 @@ class Node:
     # to print out information on the node
     def print_node_information(self):
         print(f"Node {self.id} has objective {self.NodeObjective}, data {self.data} and is connected to nodes {self.neighbours}")
-        print(f'Relevant nodes with similar objectives: {self.NodeObjectiveMatrix}')
+        print(f'Relevant nodes with similar objectives: {self.ListOfNodesWithSimilarObj}')
 
     #################################################
     # functions below are getter & setter functions #
@@ -65,14 +59,20 @@ class Node:
         self.NodeObjective = objective
 
     # NodeObjectiveMatrix refers to nodes that has the same/relevant objectives as the current node
-    def get_node_objective_matrix(self):
-        return self.NodeObjectiveMatrix
+    def get_list_of_nodes_with_similar_objectives(self):
+        return self.ListOfNodesWithSimilarObj
 
-    def set_node_objective_matrix(self, matrix):
-        self.NodeObjectiveMatrix = matrix
+    def set_list_of_nodes_with_similar_objectives(self, lst):
+        self.ListOfNodesWithSimilarObj = lst
 
-    def set_distance_to_relevant_nodes(self, distanceDict):
+    def set_distance_to_relevant_node(self, distanceDict):
         self.distanceToRelevantNodes = distanceDict
 
-    def get_distance_to_relevant_nodes(self):
+    def get_distance_to_relevant_node(self):
         return self.distanceToRelevantNodes
+
+    def set_paths_to_relevant_nodes(self, paths):
+        self.pathToRelevantNodes = paths
+    
+    def get_paths_to_relevant_nodes(self):
+        return self.pathToRelevantNodes
