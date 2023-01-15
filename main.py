@@ -76,28 +76,7 @@ def generate_graph():
     graphTest.add_vertex(8, client8Dataset, [1, 2], objectives[random.randint(0,2)])
     graphTest.print_graph_information()
 
-    print()
-    for id, nodeInstance in nodeDictionary.items():
-        nodeInstance.print_node_information()
-
-    apsp_matrix = graphTest.all_pair_shortest_path()
-    print("\nPrinting all pair shortest path (Brute Force Floyd Warshall)")
-    for cost in apsp_matrix:
-        print(cost)
-
-    # from apsp_matrix, create distanceToRelevantNodes in each instantiated node
-    print()
-    nodeIDs = list(nodeDictionary.keys())
-    for rowIndex in range(len(apsp_matrix)):
-        tmp_dict = {}
-        currNodeRelevantList = nodeDictionary[nodeIDs[rowIndex]].get_node_objective_matrix()
-        for id in currNodeRelevantList:
-            tmp_dict[id] = apsp_matrix[rowIndex][nodeIDs.index(id)]
-        nodeDictionary[nodeIDs[rowIndex]].set_distance_to_relevant_nodes(tmp_dict)
-    
-    for key, node in nodeDictionary.items():
-        print(f"Node {key}:", end=" ")
-        print(node.get_distance_to_relevant_nodes())
+    update_graph_information(graphTest, update=True)
 
 if __name__ == "__main__":
     generate_graph()
