@@ -66,20 +66,8 @@ def generate_graph():
     graphTest = Graph(nodeDictionary, neighbourDictionary)
     graphTest.print_graph_information()
 
-    # setting up node objectives for each node in the graph
-    for id, nodeInstance in nodeDictionary.items():
-        index = random.randint(0, 2)
-        nodeDictionary[id].set_objective(objectives[index])
-    graphTest.groupings_w_similar_objective()
-
-    print()
-    for id, nodeInstance in nodeDictionary.items():
-        nodeInstance.print_node_information()
-    
-    apsp_matrix = graphTest.all_pair_shortest_path()
-    print("\nPrinting all pair shortest path (Brute Force Floyd Warshall)")
-    for cost in apsp_matrix:
-        print(cost)
+    # manual_setting = False -> generate a graph with nodes randomly allocated an objective
+    setting_objective_of_node(manual_setting=True)
 
     # adding a sample vertex
     client10DataPath = os.path.join(os.getcwd(), "all_data/saved_data_client_10")
