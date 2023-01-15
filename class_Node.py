@@ -12,9 +12,9 @@ class Node:
         self.initialized = False        # will be called when graph is initialized; for new nodes to be added
         self.IdleState = False          # IdleState refers to whether node is available for training
         self.NodeObjective = None       # NodeObjective refers to ML task identifier        
-        self.ListOfNodesWithSimilarObj = None   # ListOfNodesWithSimilarObj refers to list of nodes that have relevant objective(s) as self
+        self.DictionaryOfRelevantNodes = {}   # DictionaryOfRelevantNodes refers to list of nodes that have relevant objective(s) as self
         self.distanceToRelevantNodes = None     # adjacency matrix that combines both distance and relevant nodes 
-        self.pathToRelevantNodes = None
+        self.pathToRelevantNodes = {}
 
     # @params vertexID: unique identification of new vertex
     # @params initialized: whether the node has been init
@@ -28,8 +28,12 @@ class Node:
     
     # to print out information on the node
     def print_node_information(self):
-        print(f"Node {self.id} has objective {self.NodeObjective}, data {self.data} and is connected to nodes {self.neighbours}")
-        print(f'Relevant nodes with similar objectives: {self.ListOfNodesWithSimilarObj}')
+        print(f"\nNode {self.id} has \tObjective: {self.NodeObjective},\n\t\tAllocated data: {self.data},\n\t\tConnected to nodes: {self.neighbours}")
+        output_RelevantNodes = {id:relevance for id, relevance in self.DictionaryOfRelevantNodes.items()}
+        print(f'\t\tRelevant nodes: {output_RelevantNodes}')
+        print('\t\tPath costs to each relevant nodes:')
+        for path, pathCost in self.pathToRelevantNodes.items():
+            print(f'\t\t\t{path}: {pathCost}')
 
     #################################################
     # functions below are getter & setter functions #
@@ -59,11 +63,14 @@ class Node:
         self.NodeObjective = objective
 
     # NodeObjectiveMatrix refers to nodes that has the same/relevant objectives as the current node
-    def get_list_of_nodes_with_similar_objectives(self):
-        return self.ListOfNodesWithSimilarObj
+    def get_dict_of_relevant_nodes(self):
+        return self.DictionaryOfRelevantNodes
 
-    def set_list_of_nodes_with_similar_objectives(self, lst):
-        self.ListOfNodesWithSimilarObj = lst
+    def set_dict_of_relevant_nodes(self, dict, update=False):
+        if update:
+            self.DictionaryOfRelevantNodes.update(dict)
+        else:
+            self.DictionaryOfRelevantNodes = dict
 
     def set_distance_to_relevant_node(self, distanceDict):
         self.distanceToRelevantNodes = distanceDict
@@ -72,7 +79,7 @@ class Node:
         return self.distanceToRelevantNodes
 
     def set_paths_to_relevant_nodes(self, paths):
-        self.pathToRelevantNodes = paths
+        self.pathToRelevantNodes.update(paths)
     
     def get_paths_to_relevant_nodes(self):
         return self.pathToRelevantNodes
