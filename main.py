@@ -23,6 +23,27 @@ def read_cifar_data(filePath):
     # print(f"Size of dataset loaded: {len(dataset)}")
     return dataset
 
+# setting up node objectives for each node in the graph
+def setting_objective_of_node(manual_setting = False):
+    # to generate a graph that is exactly the same as in report
+    if manual_setting:
+        # based on the graph in report, vertices 1, 3, 4 have the same objective (blue group)
+        nodeDictionary[1].set_objective(objectives[0])
+        nodeDictionary[3].set_objective(objectives[0])
+        nodeDictionary[4].set_objective(objectives[0])
+
+        # based on the graph in report, vertices 2, 5, 6, 7 have the same objective (red group)
+        nodeDictionary[2].set_objective(objectives[2])
+        nodeDictionary[5].set_objective(objectives[2])
+        nodeDictionary[6].set_objective(objectives[2])
+        nodeDictionary[7].set_objective(objectives[2])
+    
+    # to generate a graph with objectives randomly allocated to each vertices
+    else:
+        for id in nodeDictionary.keys():
+            index = random.randint(0, 2)
+            nodeDictionary[id].set_objective(objectives[index])
+
 def generate_graph():
     # generate vertices and store in nodeDictionary, in the format int(id): Node(i, data)
     data_path = os.path.join(os.getcwd(), "all_data/saved_data_client_")
