@@ -84,7 +84,5 @@ class Node:
     def get_paths_to_relevant_nodes(self):
         return self.pathToRelevantNodes
 
-    # to-do: compress path cost and transmission-only into the adjacency matrix as tuples (pathCost, True/False)
-    #        improve space efficiency of the code during execution
     # to-do: incremental approach to update matrix when new node is added, instead of re-calculating the entire matrix
     #        improve time efficiency of the code during execution
