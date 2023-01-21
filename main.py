@@ -78,6 +78,21 @@ def update_node_with_paths(pathInfo):
             shortestRelevantPaths = {path:pathCost for path, pathCost in relevantPaths.items() if pathCost == min(relevantPaths.values())}
             nodeDictionary[id].set_paths_to_relevant_nodes(shortestRelevantPaths)
 
+def combine_into_adjacency(apsp_matrix):
+    updated_matrix = []
+    for nodeID in range(len(apsp_matrix)):
+        # relevant nodes are those nodes which are either on the shortest path or have similar objectives
+        nodeInformation = nodeDictionary[nodeID+1].get_dict_of_relevant_nodes()
+        # some of the nodes that does not have similar objective and did not appear on the shortest path will be missing from the list, excluding itself
+        missingInformation = {id:False for id in nodeDictionary.keys() if id not in nodeInformation.keys() and id != nodeID+1}
+        # combine nodeInformation and missingInformation to get all information
+        nodeInformation.update(missingInformation)
+        newAPSPInformation = []
+        for nestNodeID in range(len(apsp_matrix)):
+            newAPSPInformation.append((apsp_matrix[nodeID][nestNodeID], nodeInformation.get(nestNodeID+1, 'Self')))
+        updated_matrix.append(newAPSPInformation)
+    return updated_matrix
+
 def update_graph_information(graphInstance, update):
     # updates each node with IDs of nodes that have the same objective as itself
     graphInstance.groupings_w_similar_objective(update)
@@ -95,9 +110,26 @@ def update_graph_information(graphInstance, update):
     # updating each node with shortest path distance to each relevant nodes
     set_shortest_distance_to_relevant_nodes(apsp_matrix)
 
-    # node information must be retrieved after update to the nodes has been completed
-    for _, nodeInstance in nodeDictionary.items():
-        nodeInstance.print_node_information()
+    # # node information must be retrieved after update to the nodes has been completed
+    # for _, nodeInstance in nodeDictionary.items():
+    #     nodeInstance.print_node_information()
+
+    ########################################################################################################
+    print("\nUpdated Adjacency Matrix for the graph created:")      # print statements for clarity of output
+    print('\t', end='')                                             # print statements for clarity of output
+    for _ in range(len(apsp_matrix)):                               # print statements for clarity of output
+        print(_+1, end='\t\t')                                      # print statements for clarity of output
+    print()                                                         # print statements for clarity of output
+    ########################################################################################################
+
+    # retrieve updated adjacency matrix
+    updated_matrix = combine_into_adjacency(apsp_matrix)
+    # printing out the entire graph in updated adjacency matrix
+    for rowID in range(len(updated_matrix)):
+        print(rowID+1, end='\t')
+        for colID in range(len(updated_matrix)):
+            print(updated_matrix[rowID][colID], end="\t")
+        print()
 
 def generate_graph():
     # generate vertices and store in nodeDictionary, in the format int(id): Node(i, data)
