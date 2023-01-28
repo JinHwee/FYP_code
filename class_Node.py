@@ -13,7 +13,6 @@ class Node:
         self.IdleState = False          # IdleState refers to whether node is available for training
         self.NodeObjective = None       # NodeObjective refers to ML task identifier        
         self.DictionaryOfRelevantNodes = {}   # DictionaryOfRelevantNodes refers to list of nodes that have relevant objective(s) as self
-        self.distanceToRelevantNodes = None     # adjacency matrix that combines both distance and relevant nodes 
         self.pathToRelevantNodes = {}
 
     # @params vertexID: unique identification of new vertex
@@ -71,12 +70,6 @@ class Node:
             self.DictionaryOfRelevantNodes.update(dict)
         else:
             self.DictionaryOfRelevantNodes = dict
-
-    def set_distance_to_relevant_node(self, distanceDict):
-        self.distanceToRelevantNodes = distanceDict
-
-    def get_distance_to_relevant_node(self):
-        return self.distanceToRelevantNodes
 
     def set_paths_to_relevant_nodes(self, paths):
         self.pathToRelevantNodes.update(paths)

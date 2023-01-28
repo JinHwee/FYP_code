@@ -43,17 +43,6 @@ def setting_objective_of_node(manual_setting = False):
             index = random.randint(0, 2)
             nodeDictionary[id].set_objective(objectives[index])
 
-# path and path cost update function already implemented, this function might be redundant
-def set_shortest_distance_to_relevant_nodes(matrix):
-    # from apsp_matrix, create distanceToRelevantNodes in each instantiated node
-    nodeIDs = list(nodeDictionary.keys())
-    for rowIndex in range(len(matrix)):
-        tmp_dict = {}
-        currNodeRelevantList = nodeDictionary[nodeIDs[rowIndex]].get_dict_of_relevant_nodes()
-        for id in currNodeRelevantList.keys():
-            tmp_dict[id] = matrix[rowIndex][nodeIDs.index(id)]
-        nodeDictionary[nodeIDs[rowIndex]].set_distance_to_relevant_node(tmp_dict)
-
 # check and update list of relevant nodes for each vertex from path information
 def update_list_of_relevant_nodes(pathInfo):
     # because each vertex has already been updated with relevant IDs of vertices that have the same objectives
@@ -106,9 +95,6 @@ def update_graph_information(graphInstance, update):
     # check for disjointed sets and the need for transmission only nodes, using paths retrieved from previous step
     update_list_of_relevant_nodes(all_paths)
     update_node_with_paths(all_paths)
-
-    # updating each node with shortest path distance to each relevant nodes
-    set_shortest_distance_to_relevant_nodes(apsp_matrix)
 
     # # node information must be retrieved after update to the nodes has been completed
     # for _, nodeInstance in nodeDictionary.items():
