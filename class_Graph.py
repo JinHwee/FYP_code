@@ -109,7 +109,15 @@ class Graph:
                                         listPathToBeMerged = list(pathToBeMerged)
                                         listBasePath.extend(listPathToBeMerged[1:])
                                         if tuple(listBasePath) not in paths.keys():
-                                            paths[tuple(listBasePath)] = paths.get(tuple(basePath)) + paths.get(tuple(pathToBeMerged))
+                                            newTotal = paths.get(tuple(basePath)) + paths.get(tuple(pathToBeMerged))
+                                            existingPaths = [key for key in paths.keys() if key[0] == listBasePath[0] and key[-1] == listBasePath[-1]]
+                                            if len(existingPaths) > 1:
+                                                for existingPath in existingPaths:
+                                                    if paths[existingPath] > newTotal:
+                                                        del paths[existingPath]
+                                                        paths[tuple(listBasePath)] = newTotal
+                                            else:
+                                                paths[tuple(listBasePath)] = newTotal
                         tmp_matrix.append(min(presentEdge, newCost))
                 newPathCost.append(tmp_matrix)
             previousPathCost = newPathCost
