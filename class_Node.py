@@ -77,5 +77,3 @@ class Node:
     def get_paths_to_relevant_nodes(self):
         return self.pathToRelevantNodes
 
-    # to-do: incremental approach to update matrix when new node is added, instead of re-calculating the entire matrix
-    #        improve time efficiency of the code during execution
