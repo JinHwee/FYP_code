@@ -1,7 +1,7 @@
 import random
 from class_Graph import Graph
 from class_Node import Node
-from floyd_warshall import all_pair_shortest_path, floyd_warshall_checker
+from dev_floyd_warshall import all_pair_shortest_path, floyd_warshall_checker
 import tracemalloc
 
 ### Global variables ###
