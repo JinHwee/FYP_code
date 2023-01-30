@@ -1,17 +1,10 @@
 import math, copy
 
-def floyd_warshall_checker(matrix):
-    for k in range(len(matrix)):
-        for i in range(len(matrix)):
-            for j in range(len(matrix)):
-                if i == j:
-                    matrix[i][j] = 0
-                else:
-                    matrix[i][j] = min(matrix[i][j], matrix[i][k] + matrix[k][j])
-    
-    print("\nAPSP Matrix Checker:")
-    for cost in matrix:
-        print('\t', cost)
+def combine_adjM(adjM, newNode):
+    for rowIndex in range(len(adjM)):
+        adjM[rowIndex].append(newNode[rowIndex])
+    adjM.append(newNode)
+    return adjM
 
 def floyd_warshall(matrix):
     for k in range(len(matrix)):
