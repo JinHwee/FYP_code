@@ -27,24 +27,42 @@ def add_new_node(adjMatrix, adjMatrixNewNode):
     adjMatrix.append(adjMatrixNewNode)
     adjMatrix[len(adjMatrix)-1][len(adjMatrix)-1] = 0       # value to self set to 0, modifies both arrays
     
-    # compute shortest path for newly added node
+    # compute shortest path for newly added node, check which vertex is directly connected to the newly added node
     nonZeroEdgeCosts = [i for i in adjMatrixNewNode if i > 0 and i != math.inf]
+    # store the affected nodes for recomputation later on
+    affectedNodes = []
     # if node added has one additional edge, number of non-zero values = 1
     if len(nonZeroEdgeCosts) == 1:
         connectedIndex = adjMatrix[len(adjMatrix)-1].index(nonZeroEdgeCosts[0])
+        affectedNodes.append(connectedIndex)
         relevantRow = adjMatrix[connectedIndex]
         for i in range(len(relevantRow)-1):
             newPathCost = relevantRow[i] + relevantRow[len(adjMatrix)-1]
             adjMatrix[i][len(adjMatrix)-1] = newPathCost
             adjMatrix[len(adjMatrix)-1][i] = newPathCost 
     else:
+        # recompute for new node which has more than 1 edge
         for cost in nonZeroEdgeCosts:
             connectedIndex = adjMatrix[len(adjMatrix)-1].index(cost)
+            affectedNodes.append(connectedIndex)
             relevantRow = adjMatrix[connectedIndex]
             for i in range(len(relevantRow)-1):
                 previousCost = adjMatrix[len(adjMatrix)-1][i]
                 newPathCost = relevantRow[i] + relevantRow[len(adjMatrix)-1]
-                adjMatrix[i][len(adjMatrix)-1] = min(previousCost, newPathCost)
-                adjMatrix[len(adjMatrix)-1][i] = min(previousCost, newPathCost)
+                minPathCost = min(previousCost, newPathCost)
+                adjMatrix[i][len(adjMatrix)-1] = minPathCost
+                adjMatrix[len(adjMatrix)-1][i] = minPathCost
+    
+    colAdded = len(adjMatrix) - 1           # column id is equivalent to row id
+    while len(affectedNodes) != 0:
+        affectedNode = affectedNodes.pop(0)
+        affectedRow = adjMatrix[affectedNode]
+        for index in range(len(affectedRow)):
+            prevPathCost = affectedRow[index]
+            potentialShorterCost = adjMatrix[index][colAdded] + adjMatrix[colAdded][affectedNode]
+            if potentialShorterCost < prevPathCost:
+                adjMatrix[affectedNode][index] = potentialShorterCost
+                adjMatrix[index][affectedNode] = potentialShorterCost
+                affectedNodes.append(index)
 
     return adjMatrix
