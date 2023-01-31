@@ -50,9 +50,9 @@ def add_new_node(adjMatrix, adjMatrixNewNode):
             for i in range(len(relevantRow)-1):
                 previousCost = adjMatrix[len(adjMatrix)-1][i]
                 newPathCost = relevantRow[i] + relevantRow[len(adjMatrix)-1]
-                minPathCost = min(previousCost, newPathCost)
-                adjMatrix[i][len(adjMatrix)-1] = minPathCost
-                adjMatrix[len(adjMatrix)-1][i] = minPathCost
+                if newPathCost < previousCost:
+                    adjMatrix[i][len(adjMatrix)-1] = newPathCost
+                    adjMatrix[len(adjMatrix)-1][i] = newPathCost
     
     colAdded = len(adjMatrix) - 1           # column id is equivalent to row id
     while len(affectedNodes) != 0:
