@@ -42,8 +42,9 @@ def add_new_node(adjMatrix, adjMatrixNewNode):
             adjMatrix[len(adjMatrix)-1][i] = newPathCost 
     else:
         # recompute for new node which has more than 1 edge
+        copyAddedNode = copy.deepcopy(adjMatrix[len(adjMatrix)-1])
         for cost in nonZeroEdgeCosts:
-            connectedIndex = adjMatrix[len(adjMatrix)-1].index(cost)
+            connectedIndex = copyAddedNode.index(cost)
             affectedNodes.append(connectedIndex)
             relevantRow = adjMatrix[connectedIndex]
             for i in range(len(relevantRow)-1):
