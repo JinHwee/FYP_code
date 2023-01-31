@@ -2,32 +2,34 @@ import unittest
 from dev_incremental_approach import *
 import math, copy
 
+INF = math.inf
+
 class  TestIncrementalAPSP(unittest.TestCase):
 
     adjM = [
-        [math.inf, 13, 40, math.inf],
-        [13, math.inf, 16, math.inf],
-        [40, 16, math.inf, 5],
-        [math.inf, math.inf, 5, math.inf]
+        [INF, 13, 40, INF],
+        [13, INF, 16, INF],
+        [40, 16, INF, 5],
+        [INF, INF, 5, INF]
     ]
 
-    adjNewNode_One = [math.inf, 2, math.inf, math.inf, math.inf]        # new node with one edge added, connected to Node 2
-    adjNewNode_Two = [math.inf, 2, math.inf, 3, math.inf]               # new node with two edge added, connected to Node 2 and 4
-    adjNewNode_Three = [math.inf, 2, 5, 3, math.inf]                    # new node with three edge added, connected to 2, 3 and 4
+    adjNewNode_One = [INF, 2, INF, INF, INF]        # new node with one edge added, connected to Node 2
+    adjNewNode_Two = [INF, 2, INF, 3, INF]               # new node with two edge added, connected to Node 2 and 4
+    adjNewNode_Three = [INF, 2, 5, 3, INF]                    # new node with three edge added, connected to 2, 3 and 4
 
     complicatedGraph = [
-        [math.inf, 82, 15, math.inf, math.inf, math.inf, math.inf],
-        [82, math.inf, 4, math.inf, math.inf, math.inf, math.inf],
-        [15, 4, math.inf, 95, math.inf, 36, 32],
-        [math.inf, math.inf, 95, math.inf, 29, math.inf, math.inf],
-        [math.inf, math.inf, math.inf, 29, math.inf, 18, math.inf],
-        [math.inf, math.inf, 36, math.inf, 18, math.inf, 95],
-        [math.inf, math.inf, 32, math.inf, math.inf, 95, math.inf],
+        [INF, 82, 15, INF, INF, INF, INF],
+        [82, INF, 4, INF, INF, INF, INF],
+        [15, 4, INF, 95, INF, 36, 32],
+        [INF, INF, 95, INF, 29, INF, INF],
+        [INF, INF, INF, 29, INF, 18, INF],
+        [INF, INF, 36, INF, 18, INF, 95],
+        [INF, INF, 32, INF, INF, 95, INF],
     ]
 
-    complicatedNewNode_One = [87, math.inf, math.inf, math.inf, math.inf, math.inf, math.inf, math.inf]
-    complicatedNewNode_Four = [87, 95, 70, 12, math.inf, math.inf, math.inf, math.inf]
-    complicatedNewNode_Seven = [87, 95, 70, 12, 37, 12, 9, math.inf]
+    complicatedNewNode_One = [87, INF, INF, INF, INF, INF, INF, INF]
+    complicatedNewNode_Four = [87, 95, 70, 12, INF, INF, INF, INF]
+    complicatedNewNode_Seven = [87, 95, 70, 12, 37, 71, 9, INF]
 
     def select_added_node(self, newNodeToBeAdded):
         if type(newNodeToBeAdded) == str:
@@ -56,7 +58,7 @@ class  TestIncrementalAPSP(unittest.TestCase):
         updateAdjM = add_new_node(apspMatrix, copyNewNode)           # obtains the full APSP matrix, with new node added
 
         copyAdjM, copyNewNode = self.select_added_node(id)
-        combinedAdjM = combine_adjM(copyAdjM, copyNewNode)
+        combinedAdjM = combine_adjM(copyAdjM, copyNewNode)           # generates one combined adjacency matrix for the entire graph
         checkerAdjM = floyd_warshall(combinedAdjM)
 
         return updateAdjM, checkerAdjM
