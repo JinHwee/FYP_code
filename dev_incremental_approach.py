@@ -58,6 +58,7 @@ def add_new_node(adjMatrix, adjMatrixNewNode):
                     adjMatrix[len(adjMatrix)-1][i] = newPathCost
     
     colAdded = len(adjMatrix) - 1           # column id is equivalent to row id
+    appendedBefore = []
     while len(affectedNodes) != 0:
         affectedNode = affectedNodes.pop(0)
         affectedRow = adjMatrix[affectedNode]
@@ -67,6 +68,8 @@ def add_new_node(adjMatrix, adjMatrixNewNode):
             if potentialShorterCost < prevPathCost:
                 adjMatrix[affectedNode][index] = potentialShorterCost
                 adjMatrix[index][affectedNode] = potentialShorterCost
-                affectedNodes.append(index)
+                if index not in appendedBefore:
+                    affectedNodes.append(index)
+                    appendedBefore.append(index)
 
     return adjMatrix
