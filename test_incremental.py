@@ -115,21 +115,22 @@ class  TestIncrementalAPSP(unittest.TestCase):
                 self.assertEqual(updatedMatrix[rowId][colId], checkerAdjM[rowId][colId])
         
     def test_auto_graph(self):
-        adjM, adjNewNode = self.automating_matrix_creation(20)
+        for i in range(100):
+            adjM, adjNewNode = self.automating_matrix_creation(100)
 
-        copyAdjM = copy.deepcopy(adjM)
-        copyNewNode = copy.deepcopy(adjNewNode)
-        apspMatrix = floyd_warshall(copyAdjM)
-        updatedMatrix = add_new_node(apspMatrix, copyNewNode)
+            copyAdjM = copy.deepcopy(adjM)
+            copyNewNode = copy.deepcopy(adjNewNode)
+            apspMatrix = floyd_warshall(copyAdjM)
+            updatedMatrix = add_new_node(apspMatrix, copyNewNode)
 
-        copyAdjM = copy.deepcopy(adjM)
-        copyNewNode = copy.deepcopy(adjNewNode)
-        combinedAdjM = combine_adjM(copyAdjM, copyNewNode)
-        checkerAdjM = floyd_warshall(combinedAdjM)
+            copyAdjM = copy.deepcopy(adjM)
+            copyNewNode = copy.deepcopy(adjNewNode)
+            combinedAdjM = combine_adjM(copyAdjM, copyNewNode)
+            checkerAdjM = floyd_warshall(combinedAdjM)
 
-        for rowId in range(len(checkerAdjM)):
-            for colId in range(len(checkerAdjM[rowId])):
-                self.assertEqual(updatedMatrix[rowId][colId], checkerAdjM[rowId][colId])
+            for rowId in range(len(checkerAdjM)):
+                for colId in range(len(checkerAdjM[rowId])):
+                    self.assertEqual(updatedMatrix[rowId][colId], checkerAdjM[rowId][colId])
 
 if __name__ == "__main__":
     unittest.main()
