@@ -65,14 +65,14 @@ class  TestIncrementalAPSP(unittest.TestCase):
 
     def automating_matrix_creation(self, number):
         adjMatrix = [[] for _ in range(number)]
-        newNode = [random.randint(0,100) for _ in range(number)]
+        newNode = [random.randint(1,100) for _ in range(number)]
         newNode.append(INF)
         for i in range(number):
             for j in range(i, number):
                 if i == j:
                     adjMatrix[i].append(INF)
                 else:
-                    value = random.randint(0, 100)
+                    value = random.randint(1, 100)
                     adjMatrix[i].append(value)
                     adjMatrix[j].append(value)
         
