@@ -1,6 +1,6 @@
 import unittest
 from dev_incremental_approach import *
-import math, copy
+import math, copy, random
 
 INF = math.inf
 
@@ -63,6 +63,21 @@ class  TestIncrementalAPSP(unittest.TestCase):
 
         return updateAdjM, checkerAdjM
 
+    def automating_matrix_creation(self, number):
+        adjMatrix = [[] for _ in range(number)]
+        newNode = [random.randint(0,100) for _ in range(number)]
+        newNode.append(INF)
+        for i in range(number):
+            for j in range(i, number):
+                if i == j:
+                    adjMatrix[i].append(INF)
+                else:
+                    value = random.randint(0, 100)
+                    adjMatrix[i].append(value)
+                    adjMatrix[j].append(value)
+        
+        return adjMatrix, newNode
+
     def test_adding_node_with_edge(self):
         updatedMatrix, checkerAdjM = self.instantiation_of_variables(1)
         for rowId in range(len(checkerAdjM)):
@@ -99,5 +114,22 @@ class  TestIncrementalAPSP(unittest.TestCase):
             for colId in range(len(checkerAdjM[rowId])):
                 self.assertEqual(updatedMatrix[rowId][colId], checkerAdjM[rowId][colId])
         
+    def test_auto_graph(self):
+        adjM, adjNewNode = self.automating_matrix_creation(20)
+
+        copyAdjM = copy.deepcopy(adjM)
+        copyNewNode = copy.deepcopy(adjNewNode)
+        apspMatrix = floyd_warshall(copyAdjM)
+        updatedMatrix = add_new_node(apspMatrix, copyNewNode)
+
+        copyAdjM = copy.deepcopy(adjM)
+        copyNewNode = copy.deepcopy(adjNewNode)
+        combinedAdjM = combine_adjM(copyAdjM, copyNewNode)
+        checkerAdjM = floyd_warshall(combinedAdjM)
+
+        for rowId in range(len(checkerAdjM)):
+            for colId in range(len(checkerAdjM[rowId])):
+                self.assertEqual(updatedMatrix[rowId][colId], checkerAdjM[rowId][colId])
+
 if __name__ == "__main__":
     unittest.main()
