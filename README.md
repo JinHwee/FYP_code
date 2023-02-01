@@ -6,4 +6,4 @@
 4. Combine path dictionary into adjacency matrix
 
 # Notes
-1. Partial completion for incremental approach, reason being: new node added correctly, but all adjacency matrix is not updated with new path costs
+1. Incremental algorithm successfully passed custom test cases, pending new testcases for verification.
