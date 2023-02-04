@@ -64,7 +64,7 @@ class Test_ExperimentGraphs(unittest.TestCase):
         adjM.append(newNode)
 
     # instantiation of variables in one common code block
-    def common_code_block(self, ID, large, max=False, min=False):
+    def common_code_block(self, ID, large, max=False, min=False, objective=False):
         if ID == 1:
             adjM = copy.deepcopy(self.G1)
         elif ID == 2:
@@ -76,15 +76,22 @@ class Test_ExperimentGraphs(unittest.TestCase):
         newNodeAdjM = self.create_newNode(size, large, max, min)
 
         nodeDictionary = {}
+        objectives = [i for i in self.objectivesDictionary.keys()]
         for i in range(size):
-            nodeDictionary[i] = SimpleNode(i, None, 0)
+            if objective:
+                nodeDictionary[i] = SimpleNode(i, None, random.choice(objectives))
+            else:
+                nodeDictionary[i] = SimpleNode(i, None, 0)
         
         copy_adjM = copy.deepcopy(adjM)
         copy_newNodeAdjM = copy.deepcopy(newNodeAdjM)
         graphInstance = SimpleGraph(nodeDictionary)
         graphInstance.calculate_APSP_matrix_using_Floyd_Warshall_algorithm(copy_adjM)
 
-        newNode = SimpleNode(size, None, 0)
+        if objective:
+            newNode = SimpleNode(size, None, random.choice(objectives))
+        else:
+            newNode = SimpleNode(size, None, 0)
         graphInstance.add_new_node(newNode, copy_newNodeAdjM)
         apspM = graphInstance.get_APSP_Matrix()
 
@@ -167,6 +174,25 @@ class Test_ExperimentGraphs(unittest.TestCase):
     
     def test_4_G3(self):
         apspM, checkerAdjM = self.common_code_block(3, False, min=True)
+        for rowId in range(len(checkerAdjM)):
+            for colId in range(len(checkerAdjM[rowId])):
+                self.assertEqual(apspM[rowId][colId], checkerAdjM[rowId][colId])
+
+    # testing objective changes; note that id of SimpleNodes ranges from 0 to len(nodeDictionary)-1
+    def test_Obj_1_G1(self):
+        apspM, checkerAdjM = self.common_code_block(1, False, max=True, objective=True)
+        for rowId in range(len(checkerAdjM)):
+            for colId in range(len(checkerAdjM[rowId])):
+                self.assertEqual(apspM[rowId][colId], checkerAdjM[rowId][colId])
+
+    def test_Obj_1_G2(self):
+        apspM, checkerAdjM = self.common_code_block(2, False, min=True, objective=True)
+        for rowId in range(len(checkerAdjM)):
+            for colId in range(len(checkerAdjM[rowId])):
+                self.assertEqual(apspM[rowId][colId], checkerAdjM[rowId][colId])
+
+    def test_Obj_1_G3(self):
+        apspM, checkerAdjM = self.common_code_block(3, False, min=True, objective=True)
         for rowId in range(len(checkerAdjM)):
             for colId in range(len(checkerAdjM[rowId])):
                 self.assertEqual(apspM[rowId][colId], checkerAdjM[rowId][colId])
