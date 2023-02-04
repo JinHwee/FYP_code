@@ -51,10 +51,10 @@ def setting_objective_of_node(manual_setting = False):
 def generate_graph():
     # generate vertices and store in nodeDictionary, in the format int(id): Node(i, data)
     data_path = os.path.join(os.getcwd(), "all_data/saved_data_client_")
-    for i in range(1, 8):
-        currentFile = data_path + str(i)
+    for i in range(7):
+        currentFile = data_path + str(i+1)
         dataDict = read_cifar_data(currentFile)
-        nodeDictionary[i-1] = SimpleNode(i, dataDict, 0)      # nodeObjective initialized as 0
+        nodeDictionary[i] = SimpleNode(i, dataDict, 0)      # nodeObjective initialized as 0
     
     setting_objective_of_node(True)             # update nodeObjective to specific values
     graphInstance = SimpleGraph(nodeDictionary)
