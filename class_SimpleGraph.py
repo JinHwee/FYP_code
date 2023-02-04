@@ -122,7 +122,7 @@ class SimpleGraph:
                         if len(newPath) < len(currentPath):
                             self.APSPMatrix[i][len(self.APSPMatrix)-1][2] = self.APSPMatrix[i][connectedIndex][2] + self.APSPMatrix[connectedIndex][len(self.APSPMatrix)-1][2]
                             self.APSPMatrix[len(self.APSPMatrix)-1][i][2] = self.APSPMatrix[len(self.APSPMatrix)-1][connectedIndex][2] + self.APSPMatrix[connectedIndex][i][2]
-                        elif len(newPath) == len(currentPath) and newPath != currentPath:
+                        elif len(newPath) == len(currentPath):
                             nodesOnNewPath = []
                             nodesOnOldPath = []
                             for id in range(len(newPath)):
@@ -166,7 +166,7 @@ class SimpleGraph:
                         if len(newPath) < len(currentPath):
                             self.APSPMatrix[affectedNode][index][2] = self.APSPMatrix[affectedNode][colAdded][2] + self.APSPMatrix[colAdded][index][2]
                             self.APSPMatrix[index][affectedNode][2] = self.APSPMatrix[index][colAdded][2] + self.APSPMatrix[colAdded][affectedNode][2]
-                        elif len(newPath) == len(currentPath) and newPath != currentPath:
+                        elif len(newPath) == len(currentPath):
                             nodesOnNewPath = []
                             nodesOnOldPath = []
                             for id in range(len(newPath)):
@@ -183,10 +183,19 @@ class SimpleGraph:
                                     if self.APSPMatrix[index][id][1]:
                                         oldCount += 1
                             if oldCount < newCount:
-                                self.APSPMatrix[index][colAdded][2] = newPath
-                                self.APSPMatrix[colAdded][index][2] = self.APSPMatrix[colAdded][connectedIndex][2] + self.APSPMatrix[connectedIndex][i][2]
+                                self.APSPMatrix[index][affectedNode][2] = newPath
+                                self.APSPMatrix[affectedNode][index][2] = self.APSPMatrix[affectedNode][colAdded][2] + self.APSPMatrix[colAdded][index][2]
 
 
     # getter and setter methods
     def get_APSP_Matrix(self):
         return self.APSPMatrix
+
+    def update_node_objective(self, id, newObjective):
+        self.NodeDictionary[id].update_node_objective(newObjective)
+        for index in range(len(self.APSPMatrix)):
+            if index == id:
+                continue
+            cellValue = self.NodeDictionary[index].get_node_objective() == self.NodeDictionary[id].get_node_objective()
+            self.APSPMatrix[index][id][1] = cellValue
+            self.APSPMatrix[id][index][1] = cellValue
