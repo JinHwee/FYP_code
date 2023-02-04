@@ -1,5 +1,7 @@
 import unittest
 from dev_incremental_approach import *
+from class_SimpleGraph import *
+from class_SimpleNode import *
 import math, copy, random
 
 INF = math.inf
@@ -131,6 +133,34 @@ class  TestIncrementalAPSP(unittest.TestCase):
             for rowId in range(len(checkerAdjM)):
                 for colId in range(len(checkerAdjM[rowId])):
                     self.assertEqual(updatedMatrix[rowId][colId], checkerAdjM[rowId][colId])
+
+    def test_SimpleGraph(self):
+        numberOfNodes = 50
+        adjM, adjNewNode = self.automating_matrix_creation(numberOfNodes)
+        
+        copyAdjM = copy.deepcopy(adjM)
+        copyNewNode = copy.deepcopy(adjNewNode)
+
+        nodeDictionary = {}                     # instantiating variables to initialize SimpleGraph variable
+        for i in range(numberOfNodes):
+            nodeDictionary[i] = SimpleNode(i, None, 0)
+
+        graphInstance = SimpleGraph(nodeDictionary)
+        graphInstance.calculate_APSP_matrix_using_Floyd_Warshall_algorithm(copyAdjM)
+        newNode = SimpleNode(len(nodeDictionary)+1, None, 0)
+        graphInstance.add_new_node(newNode, copyNewNode)
+        apspM = graphInstance.get_APSP_Matrix()
+        
+        copyAdjM = copy.deepcopy(adjM)
+        copyNewNode = copy.deepcopy(adjNewNode)
+        combinedAdjM = combine_adjM(copyAdjM, copyNewNode)
+        graphCheckerInstance = SimpleGraph(nodeDictionary)
+        graphCheckerInstance.calculate_APSP_matrix_using_Floyd_Warshall_algorithm(combinedAdjM)
+        checkerAdjM = graphCheckerInstance.get_APSP_Matrix()
+
+        for rowId in range(len(checkerAdjM)):
+                for colId in range(len(checkerAdjM[rowId])):
+                    self.assertEqual(apspM[rowId][colId], checkerAdjM[rowId][colId])
 
 if __name__ == "__main__":
     unittest.main()
