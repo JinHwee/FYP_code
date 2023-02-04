@@ -55,7 +55,6 @@ class SimpleGraph:
                 modifiedMatrix.append(cellValue)
             else:
                 lastRowValue = [0, 'Self', list()]
-                # cellValue = [0, 'Self']
             lastRowList.append(lastRowValue)
         
         for cellIndex in range(len(self.APSPMatrix)):
