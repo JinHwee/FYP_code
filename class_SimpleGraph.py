@@ -34,8 +34,28 @@ class SimpleGraph:
                         elif newPathCost == oldPathCost:
                             oldPath = self.APSPMatrix[i][j][2]
                             newPath = self.APSPMatrix[i][k][2] + self.APSPMatrix[k][j][2]
-                            if len(newPath) < len(oldPath):
+                            if newPath == oldPath:
+                                continue
+                            elif len(newPath) < len(oldPath):
                                 self.APSPMatrix[i][j][2] = newPath
+                            elif len(newPath) == len(oldPath):
+                                nodesOnNewPath = []
+                                nodesOnOldPath = []
+                                for id in range(len(newPath)):
+                                    nodesOnNewPath += newPath[id].split(' -> ')
+                                    nodesOnOldPath += oldPath[id].split(' -> ')
+                                nodesOnNewPath = [int(i) for i in set(nodesOnNewPath)]
+                                nodesOnOldPath = [int(i) for i in set(nodesOnOldPath)]
+                                newCount, oldCount = 0, 0
+                                for id in range(len(nodesOnNewPath)):
+                                    if nodesOnNewPath[id] != i:
+                                        if self.APSPMatrix[i][id][1]:
+                                            newCount += 1
+                                    if nodesOnOldPath[id] != i:
+                                        if self.APSPMatrix[i][id][1]:
+                                            oldCount += 1
+                                if oldCount < newCount:
+                                    self.APSPMatrix[i][j][2] = newPath
 
     # adjMatrix refers to the graph's adjacency matrix, adjMatrixNewNode refers to the newly added node's adjacency matrix.
     def add_new_node(self, newNode, adjMatrixNewNode):
@@ -102,6 +122,25 @@ class SimpleGraph:
                         if len(newPath) < len(currentPath):
                             self.APSPMatrix[i][len(self.APSPMatrix)-1][2] = self.APSPMatrix[i][connectedIndex][2] + self.APSPMatrix[connectedIndex][len(self.APSPMatrix)-1][2]
                             self.APSPMatrix[len(self.APSPMatrix)-1][i][2] = self.APSPMatrix[len(self.APSPMatrix)-1][connectedIndex][2] + self.APSPMatrix[connectedIndex][i][2]
+                        elif len(newPath) == len(currentPath) and newPath != currentPath:
+                            nodesOnNewPath = []
+                            nodesOnOldPath = []
+                            for id in range(len(newPath)):
+                                nodesOnNewPath += newPath[id].split(' -> ')
+                                nodesOnOldPath += currentPath[id].split(' -> ')
+                            nodesOnNewPath = [int(i) for i in set(nodesOnNewPath)]
+                            nodesOnOldPath = [int(i) for i in set(nodesOnOldPath)]
+                            newCount, oldCount = 0, 0
+                            for id in range(len(nodesOnNewPath)):
+                                if nodesOnNewPath[id] != i:
+                                    if self.APSPMatrix[i][id][1]:
+                                        newCount += 1
+                                if nodesOnOldPath[id] != i:
+                                    if self.APSPMatrix[i][id][1]:
+                                        oldCount += 1
+                            if oldCount < newCount:
+                                self.APSPMatrix[i][len(self.APSPMatrix)-1][2] = newPath
+                                self.APSPMatrix[len(self.APSPMatrix)-1][i][2] = self.APSPMatrix[len(self.APSPMatrix)-1][connectedIndex][2] + self.APSPMatrix[connectedIndex][i][2]
 
         colAdded = len(self.APSPMatrix) - 1           # column id is equivalent to row id
         appendedBefore = []
@@ -127,6 +166,25 @@ class SimpleGraph:
                         if len(newPath) < len(currentPath):
                             self.APSPMatrix[affectedNode][index][2] = self.APSPMatrix[affectedNode][colAdded][2] + self.APSPMatrix[colAdded][index][2]
                             self.APSPMatrix[index][affectedNode][2] = self.APSPMatrix[index][colAdded][2] + self.APSPMatrix[colAdded][affectedNode][2]
+                        elif len(newPath) == len(currentPath) and newPath != currentPath:
+                            nodesOnNewPath = []
+                            nodesOnOldPath = []
+                            for id in range(len(newPath)):
+                                nodesOnNewPath += newPath[id].split(' -> ')
+                                nodesOnOldPath += currentPath[id].split(' -> ')
+                            nodesOnNewPath = [int(i) for i in set(nodesOnNewPath)]
+                            nodesOnOldPath = [int(i) for i in set(nodesOnOldPath)]
+                            newCount, oldCount = 0, 0
+                            for id in range(len(nodesOnNewPath)):
+                                if nodesOnNewPath[id] != index:
+                                    if self.APSPMatrix[index][id][1]:
+                                        newCount += 1
+                                if nodesOnOldPath[id] != index:
+                                    if self.APSPMatrix[index][id][1]:
+                                        oldCount += 1
+                            if oldCount < newCount:
+                                self.APSPMatrix[index][colAdded][2] = newPath
+                                self.APSPMatrix[colAdded][index][2] = self.APSPMatrix[colAdded][connectedIndex][2] + self.APSPMatrix[connectedIndex][i][2]
 
 
     # getter and setter methods
