@@ -1,4 +1,4 @@
-import math, argparse, json
+import math, argparse, json, os
 from class_SimpleGraph import *
 from class_SimpleNode import *
 
@@ -103,8 +103,8 @@ def generate_paths(graphID, nodeToBeAdded, src, dest):
     for string in orderStrings:
         tmp_list = string.split(' -> ')
         for id in tmp_list:
-            if id not in order:
-                order.append(id)
+            if int(id) not in order:
+                order.append(int(id))
 
     train = []
     for id in order:
@@ -113,19 +113,25 @@ def generate_paths(graphID, nodeToBeAdded, src, dest):
         train.append(nodeDictionary[int(id)].get_node_objective() == nodeDictionary[dest].get_node_objective())
 
     order_json = {}
-
+    order = [i+1 for i in order]
     for ind, item in enumerate(order):
         try:
-            order_json[str(ind+1)] = {"from": str(item),
-                                    "train": train[ind],
+            order_json[str(ind+1)] = {"from": str(int(item)),
+                                    "train": bool(train[ind]),
                                     "to": str(order[ind+1])
                                     }
         except IndexError as e:
             # Last item does not have a "to" node
             None
 
-    with open("comm_template.json", "w") as outfile:
-        json.dump(order_json, outfile)
+    if not any(train):
+        try:
+            os.remove("./peer/comm_template.json")
+        except:
+            "File removed"
+    else:
+        with open("./peer/comm_template.json", "w") as outfile:
+            json.dump(order_json, outfile)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -135,3 +141,4 @@ if __name__ == "__main__":
     parser.add_argument("-dest", type=int)
     args = parser.parse_args()
     generate_paths(args.graphID, args.addNewNode, args.src, args.dest)
+
