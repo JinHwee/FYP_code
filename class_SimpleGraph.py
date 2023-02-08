@@ -1,28 +1,29 @@
-import math, copy
+import math, copy, re
 
 class SimpleGraph:
 
-    def __init__(self, allNodes) -> None:
+    def __init__(self, allNodes, adjM) -> None:
         self.INF = math.inf
         self.NodeDictionary = allNodes
+        self.originalAdjM = adjM
         self.APSPMatrix = None
 
-    def calculate_APSP_matrix_using_Floyd_Warshall_algorithm(self, adjM):
+    def calculate_APSP_matrix_using_Floyd_Warshall_algorithm(self):
         self.APSPMatrix = []
-        for i in range(len(adjM)):
+        for i in range(len(self.originalAdjM)):
             rowValues = []
-            for j in range(len(adjM)):
+            for j in range(len(self.originalAdjM)):
                 if i == j:
-                    rowValues.append([adjM[i][j], 'Self', list()])
+                    rowValues.append([self.originalAdjM[i][j], 'Self', list()])
                 else:
-                    rowValues.append([adjM[i][j], \
+                    rowValues.append([self.originalAdjM[i][j], \
                         self.NodeDictionary[i].get_node_objective() == self.NodeDictionary[j].get_node_objective(), \
                         [f'{self.NodeDictionary[i].get_node_id()} -> {self.NodeDictionary[j].get_node_id()}']])
             self.APSPMatrix.append(rowValues)
 
-        for k in range(len(adjM)):
-            for i in range(len(adjM)):
-                for j in range(len(adjM)):
+        for k in range(len(self.originalAdjM)):
+            for i in range(len(self.originalAdjM)):
+                for j in range(len(self.originalAdjM)):
                     if i == j:
                         self.APSPMatrix[i][j][0] = 0
                     else:
@@ -186,6 +187,30 @@ class SimpleGraph:
                                 self.APSPMatrix[index][affectedNode][2] = newPath
                                 self.APSPMatrix[affectedNode][index][2] = self.APSPMatrix[affectedNode][colAdded][2] + self.APSPMatrix[colAdded][index][2]
 
+    def delete_node(self, nodeID):
+        # update self.NodeDictionary to reflect latest number of nodes
+        allKeys = list(self.NodeDictionary.keys())
+
+        tmpDict = {}
+        id = 0
+        toRemove = None
+        maxValue = len(allKeys)
+        while id < maxValue-1:
+            if self.NodeDictionary[allKeys[id]].get_node_id() == nodeID:
+                print("Triggered")
+                toRemove = id
+                allKeys.pop(id)
+            else:
+                tmpDict[id] = self.NodeDictionary[allKeys[id]]
+                id += 1
+        self.NodeDictionary = tmpDict
+        del tmpDict
+
+        # update APSP matrix
+        del self.APSPMatrix[toRemove]
+
+        for row in self.APSPMatrix:
+            del row[toRemove]
 
     # getter and setter methods
     def get_APSP_Matrix(self):
