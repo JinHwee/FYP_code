@@ -90,7 +90,6 @@ class SimpleGraph:
         
         for cellIndex in range(len(self.APSPMatrix)):
             self.originalAdjM[cellIndex].append(adjMatrixNewNode[cellIndex])
-            self.originalAdjM[cellIndex].append(adjMatrixNewNode[cellIndex])
             self.APSPMatrix[cellIndex].append(modifiedMatrix[cellIndex])
         self.APSPMatrix.append(lastRowList)
         self.originalAdjM.append(adjMatrixNewNode)
@@ -231,7 +230,7 @@ class SimpleGraph:
         for rowID in range(len(self.originalAdjM)):
             del self.originalAdjM[rowID][toRemove]
             del self.APSPMatrix[rowID][toRemove]
-            
+
         mappingMatrix = []
         limitCounter = 0
         stringSearch = f'[0-9]+ -> {idAffected}|{idAffected} -> [0-9]+'
