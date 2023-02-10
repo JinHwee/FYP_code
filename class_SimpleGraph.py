@@ -29,6 +29,17 @@ class SimpleGraph:
                     else:
                         oldPathCost = self.APSPMatrix[i][j][0]
                         newPathCost = self.APSPMatrix[i][k][0] + self.APSPMatrix[k][j][0]
+                        edges = self.APSPMatrix[i][k][2] + self.APSPMatrix[k][j][2]
+                        wrongPath = False
+                        for edge in edges:
+                            tmp = edge.split(' -> ')
+                            stringFormat = re.compile(f'^{tmp[0]} -> {tmp[1]}$|^{tmp[1]} -> {tmp[0]}$')
+                            results = list(filter(stringFormat.match, edges))
+                            if len(results) > 1:
+                                wrongPath = True
+                                break
+                        if wrongPath:
+                            continue
                         if newPathCost < oldPathCost:
                             self.APSPMatrix[i][j][0] = newPathCost
                             self.APSPMatrix[i][j][2] = self.APSPMatrix[i][k][2] + self.APSPMatrix[k][j][2]
@@ -62,7 +73,6 @@ class SimpleGraph:
     def add_new_node(self, newNode, adjMatrixNewNode):
         # update NodeDictionary with new Node
         self.NodeDictionary[len(self.NodeDictionary)] = newNode
-        
         modifiedMatrix = []
         lastRowList = []
         for costIndex in range(len(adjMatrixNewNode)):
@@ -79,8 +89,10 @@ class SimpleGraph:
             lastRowList.append(lastRowValue)
         
         for cellIndex in range(len(self.APSPMatrix)):
+            self.originalAdjM[cellIndex].append(adjMatrixNewNode[cellIndex])
             self.APSPMatrix[cellIndex].append(modifiedMatrix[cellIndex])
         self.APSPMatrix.append(lastRowList)
+        self.originalAdjM.append(adjMatrixNewNode)
 
         # compute shortest path for newly added node, check which vertex is directly connected to the newly added node
         nonZeroEdgeCosts = [i for i in adjMatrixNewNode if i > 0 and i != math.inf]
@@ -176,13 +188,14 @@ class SimpleGraph:
                             nodesOnNewPath = [int(i) for i in set(nodesOnNewPath)]
                             nodesOnOldPath = [int(i) for i in set(nodesOnOldPath)]
                             newCount, oldCount = 0, 0
-                            for id in range(len(nodesOnNewPath)):
-                                if nodesOnNewPath[id] != index:
-                                    if self.APSPMatrix[index][id][1]:
-                                        newCount += 1
-                                if nodesOnOldPath[id] != index:
-                                    if self.APSPMatrix[index][id][1]:
-                                        oldCount += 1
+                            # for id in range(len(nodesOnNewPath)):
+                            # print(currentPath, newPath)
+                            if nodesOnNewPath[id] != index:
+                                if self.APSPMatrix[index][id][1]:
+                                    newCount += 1
+                            if nodesOnOldPath[id] != index:
+                                if self.APSPMatrix[index][id][1]:
+                                    oldCount += 1
                             if oldCount < newCount:
                                 self.APSPMatrix[index][affectedNode][2] = newPath
                                 self.APSPMatrix[affectedNode][index][2] = self.APSPMatrix[affectedNode][colAdded][2] + self.APSPMatrix[colAdded][index][2]
@@ -190,27 +203,95 @@ class SimpleGraph:
     def delete_node(self, nodeID):
         # update self.NodeDictionary to reflect latest number of nodes
         allKeys = list(self.NodeDictionary.keys())
-
         tmpDict = {}
         id = 0
         toRemove = None
+        idAffected = None
         maxValue = len(allKeys)
-        while id < maxValue-1:
-            if self.NodeDictionary[allKeys[id]].get_node_id() == nodeID:
-                print("Triggered")
-                toRemove = id
-                allKeys.pop(id)
-            else:
-                tmpDict[id] = self.NodeDictionary[allKeys[id]]
-                id += 1
-        self.NodeDictionary = tmpDict
-        del tmpDict
+        if nodeID == maxValue - 1:
+            toRemove = nodeID
+            idAffected = nodeID
+        else:
+            while id < maxValue - 1:
+                if self.NodeDictionary[allKeys[id]].get_node_id() == nodeID:
+                    idAffected = self.NodeDictionary[allKeys[id]].get_node_id()
+                    toRemove = id
+                    allKeys.pop(id)
+                else:
+                    tmpDict[id] = self.NodeDictionary[allKeys[id]]
+                    id += 1
+            self.NodeDictionary = tmpDict
+            del tmpDict
 
         # update APSP matrix
         del self.APSPMatrix[toRemove]
+        del self.originalAdjM[toRemove]
 
-        for row in self.APSPMatrix:
-            del row[toRemove]
+        for rowID in range(len(self.originalAdjM)):
+            del self.originalAdjM[rowID][toRemove]
+            del self.APSPMatrix[rowID][toRemove]
+
+        # print()
+        # for row in self.APSPMatrix:
+        #     print(row)
+
+        mappingMatrix = []
+        limitCounter = 0
+        stringSearch = f'[0-9]+ -> {idAffected}|{idAffected} -> [0-9]+'
+        for rowID in range(len(self.APSPMatrix)):
+            tmp_row = []
+            for colID in range(len(self.APSPMatrix)):
+                toModify = False
+                for string in self.APSPMatrix[rowID][colID][2]:
+                    if re.search(stringSearch, string):
+                        limitCounter += 1
+                        toModify = True
+                        self.APSPMatrix[rowID][colID][0] = self.originalAdjM[rowID][colID]
+                        self.APSPMatrix[rowID][colID][2] = [f'{self.NodeDictionary[rowID].get_node_id()} -> {self.NodeDictionary[colID].get_node_id()}']
+                        break
+                tmp_row.append(toModify)
+            mappingMatrix.append(tmp_row)
+
+        sizeOfMatrix = len(self.originalAdjM)
+        if limitCounter < sizeOfMatrix ** 2 - sizeOfMatrix and limitCounter > 0:
+            for additionalNodeID in range(sizeOfMatrix):
+                for i in range(sizeOfMatrix):
+                    for j in range(sizeOfMatrix):
+                        if mappingMatrix[i][j]:
+                            oldPathCost = self.APSPMatrix[i][j][0]
+                            newPathCost = self.APSPMatrix[i][additionalNodeID][0] + self.APSPMatrix[additionalNodeID][j][0]
+                            if newPathCost < oldPathCost:
+                                self.APSPMatrix[i][j][0] = newPathCost
+                                self.APSPMatrix[i][j][2] = self.APSPMatrix[i][additionalNodeID][2] + self.APSPMatrix[additionalNodeID][j][2]
+                            elif newPathCost == oldPathCost:
+                                oldPath = self.APSPMatrix[i][j][2]
+                                newPath = self.APSPMatrix[i][additionalNodeID][2] + self.APSPMatrix[additionalNodeID][j][2]
+                                if newPath == oldPath:
+                                    continue
+                                elif len(newPath) < len(oldPath):
+                                    self.APSPMatrix[i][j][2] = newPath
+                                elif len(newPath) == len(oldPath):
+                                    nodesOnNewPath = []
+                                    nodesOnOldPath = []
+                                    for id in range(len(newPath)):
+                                        nodesOnNewPath += newPath[id].split(' -> ')
+                                        nodesOnOldPath += oldPath[id].split(' -> ')
+                                    nodesOnNewPath = [int(i) for i in set(nodesOnNewPath)]
+                                    nodesOnOldPath = [int(i) for i in set(nodesOnOldPath)]
+                                    if len(nodesOnNewPath) == len(nodesOnOldPath):
+                                        newCount, oldCount = 0, 0
+                                        for id in range(len(nodesOnNewPath)):
+                                            if nodesOnNewPath[id] != i:
+                                                if self.APSPMatrix[i][id][1]:
+                                                    newCount += 1
+                                            if nodesOnOldPath[id] != i:
+                                                if self.APSPMatrix[i][id][1]:
+                                                    oldCount += 1
+                                        if oldCount < newCount:
+                                            self.APSPMatrix[i][j][2] = newPath
+
+        elif limitCounter == sizeOfMatrix ** 2 - sizeOfMatrix:
+            self.calculate_APSP_matrix_using_Floyd_Warshall_algorithm()
 
     # getter and setter methods
     def get_APSP_Matrix(self):
