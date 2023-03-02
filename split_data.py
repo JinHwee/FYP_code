@@ -22,8 +22,34 @@ def load_dataset(folderName):
         img = cv2.resize(img, dsize=(32, 32))
         image_array.append(img)
     trainX = np.asarray(image_array)
-    tmp_trainY = [all_classes.index(folderName) for i in range(directorySize)]
+    tmp_trainY = [1 for i in range(directorySize)]
     trainY = np.reshape(tmp_trainY, (len(tmp_trainY), 1))
+
+    other_array = []
+    # to include things that are not related to the training set
+    for class_name in all_classes:
+        if class_name == folderName:
+            continue
+        
+        counter = 0
+        selected_before = []
+        other_directory = os.path.join('./nuimages/train', class_name)
+        size_other_directory = len(fnmatch.filter(os.listdir(other_directory), '*.jpg'))
+        sample_size = 0.1 * size_other_directory
+        while counter < 500:
+            file_selected = random.choice(fnmatch.filter(os.listdir(other_directory), '*.jpg'))
+            if file_selected not in selected_before:
+                img = cv2.imread(os.path.join(other_directory, file_selected))
+                img = cv2.resize(img, dsize=(32,32))
+                other_array.append(img)
+                selected_before.append(file_selected)
+                counter += 1
+
+    other_X = np.asarray(other_array)
+    trainX = np.append(trainX, other_X, axis=0)
+    other_Y = np.asarray([0 for i in range(len(other_X))])
+    other_Y = np.reshape(other_Y, (len(other_Y), 1))
+    trainY = np.append(trainY, other_Y, axis=0)
 
     testDirPath = os.path.join('./nuimages/val', folderName)
     directorySize = len(fnmatch.filter(os.listdir(testDirPath), '*.jpg'))
@@ -34,11 +60,18 @@ def load_dataset(folderName):
         test_array.append(img)
 
     testX = np.asarray(test_array)
-    tmp_testY = [all_classes.index(folderName) for i in range(directorySize)]
-    testY = np.reshape(tmp_testY, (len(tmp_testY), 1))
+    testY = np.asarray([1 for i in range(directorySize)])
+    testY = np.reshape(testY, (len(testY), 1))
 
-    trainY = to_categorical(trainY)
-    testY = to_categorical(testY)
+    # trainY = to_categorical(trainY)
+    # testY = to_categorical(testY)
+
+    # print(testY.dtype)
+
+    print('\n\n')
+    print(trainX.shape, trainY.shape, testX.shape, testY.shape)
+    print('\n\n')
+
     return trainX, trainY, testX, testY
 
 def prep_pixels(train, test):
@@ -90,7 +123,7 @@ def create_and_save_clients(folderName, num_clients=10):
 
     basepath = os.path.join(os.getcwd(), "all_data")
     os.makedirs(basepath, 0o777, exist_ok=True)
-    currentData = len([i for i in list(os.listdir(basepath)) if i != "saved_data_test"])
+    currentData = len([i for i in list(os.listdir(basepath))])
     # process and batch the training data for each client
     clients_batched = dict()
     for (client_name, data) in clients.items():
@@ -99,22 +132,24 @@ def create_and_save_clients(folderName, num_clients=10):
         # saving the dataset to disk
         if currentData != 0:
             client_id = int(client_name[client_name.index("_")+1:])
-            new_name = client_name[:-1] + str(client_id+currentData)
-            client_filename = "saved_data_" + new_name
+            new_name = client_name[:client_name.index("_")+1] + str(client_id+currentData)
+            client_filename = "saved_data_" + 'train'
+            directory_name = new_name
         else:
-            client_filename = "saved_data_" + client_name
-        client_path = os.path.join(basepath, client_filename)
+            directory_name = client_name
+            client_filename = "saved_data_" + 'train'
+        client_path = os.path.join(basepath, directory_name, client_filename)
+        print(client_path)
         tf.data.experimental.save(clients_batched[client_name], client_path)
-    # print(clients_batched)
 
-    # process and batch the test set
-    test_batched = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(len(y_test))
-    # print(type(test_batched), len(test_batched))
-    client_filename = "saved_data_test"
-    client_path = os.path.join(basepath, client_filename)
-    tf.data.experimental.save(test_batched, client_path)
+        test_batched = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(len(y_test))
+        client_filename = "saved_data_test"
+        client_path = os.path.join(basepath, directory_name, client_filename)
+        tf.data.experimental.save(test_batched, client_path)
 
 if __name__ == "__main__":
     random.seed(42)
-    create_and_save_clients('pedestrian', 3)
-    create_and_save_clients('vehicle.truck', 4)
+    create_and_save_clients('pedestrian', 20)
+    create_and_save_clients('vehicle.truck', 20)
+    create_and_save_clients('movable_object.barrier', 20)
+    create_and_save_clients('vehicle.motorcycle', 20)
