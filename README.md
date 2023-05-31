@@ -1,7 +1,5 @@
-# FYP_code
+# Efficient multi-objective peer-to-peer federated learning
 
-# To-do
-1. Incremental deletion of node from graph
+This repository contains codes for my Final Year Project (FYP) submitted to Nanyang Technological University (NTU).
 
-# Notes
-1. Incremental algorithm successfully passed custom test cases, pending new testcases for verification.
+
