@@ -30,7 +30,7 @@ class SimpleMLP:
         # model_1.add(Dropout(.3))#Adding a dropout layer that will randomly drop 30% of the weights
         model_1.add(Dense(128, activation=('relu')))
         # model_1.add(Dropout(.2))
-        model_1.add(Dense(10, activation=('softmax')))  # This is the classification layer
+        model_1.add(Dense(1, activation=('sigmoid')))  # This is the classification layer
         return model_1
 
 
@@ -78,10 +78,12 @@ def sum_scaled_weights(scaled_weight_list):
 def load_client_dataset():
     # basepath = os.path.join(os.getcwd(), "all_data")
     # client_path = os.path.join(basepath, "saved_data_client_"+str(client_num))
-    client_path = "/usr/thisdocker/dataset"
+    client_path = "/usr/thisdocker/dataset/saved_data_train"
     print("[INFO] Loading from {} ".format(client_path))
+    test_path = "/usr/thisdocker/dataset/saved_data_test"
     new_dataset = tf.data.experimental.load(client_path)
-    return new_dataset
+    test_dataset = tf.data.experimental.load(test_path)
+    return new_dataset, test_dataset
 
 
 # if __name__ == '__main__':
@@ -89,7 +91,7 @@ def local_training(client_num, local_model, build_flag):
     # Load client dataset from volume mounted folder
     # client_num = 1
     log_prefix = "[" + str(client_num).upper() + "] "
-    local_dataset = load_client_dataset()
+    local_dataset, test_set = load_client_dataset()
     x = local_dataset.element_spec[0].shape[1]
     y = local_dataset.element_spec[0].shape[2]
     z = local_dataset.element_spec[0].shape[3]
@@ -98,8 +100,9 @@ def local_training(client_num, local_model, build_flag):
 
     if build_flag:
         # Create model
-        lr = 0.01
-        loss = 'categorical_crossentropy'
+        lr = 0.0001
+        # loss = 'categorical_crossentropy'
+        loss = 'binary_crossentropy'
         metrics = ['accuracy']
         optimizer = SGD(lr=lr, decay=lr, momentum=0.9)
 
@@ -111,7 +114,7 @@ def local_training(client_num, local_model, build_flag):
 
     print("%sTraining model ..." % log_prefix)
     # Training
-    local_model.fit(local_dataset, epochs=1, verbose=1)
+    local_model.fit(local_dataset, validation_data=test_set, epochs=1, verbose=1)
     print("%sDone" % log_prefix)
 
     # Save model - moved to node
